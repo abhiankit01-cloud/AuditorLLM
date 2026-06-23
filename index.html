@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditor LLM - Audit & Compliance Intellect Workspace</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Mermaid.js for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    
+    <!-- File Parsers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Premium Markdown Styles for Document Viewer */
+        .markdown-body h1 { font-size: 1.6em; font-weight: 700; margin-bottom: 0.6em; margin-top: 1.2em; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em; }
+        .markdown-body h2 { font-size: 1.35em; font-weight: 600; margin-bottom: 0.5em; margin-top: 1.1em; color: #334155; }
+        .markdown-body h3 { font-size: 1.15em; font-weight: 600; margin-bottom: 0.5em; margin-top: 1em; color: #475569; }
+        .markdown-body p { margin-bottom: 1.1em; line-height: 1.75; color: #334155; font-size: 0.95rem; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.6em; margin-bottom: 1.1em; color: #334155; }
+        .markdown-body ol { list-style-type: decimal; padding-left: 1.6em; margin-bottom: 1.1em; color: #334155; }
+        .markdown-body li { margin-bottom: 0.4em; }
+        .markdown-body strong { font-weight: 600; color: #0f172a; }
+        .markdown-body pre { background: #f8fafc; padding: 1.2em; border-radius: 0.75em; border: 1px solid #e2e8f0; overflow-x: auto; margin-bottom: 1.2em; font-family: 'JetBrains Mono', monospace; }
+        .markdown-body code { font-family: 'JetBrains Mono', monospace; background: #f1f5f9; padding: 0.25em 0.45em; border-radius: 0.35em; font-size: 0.85em; color: #0f766e; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1.5em; font-size: 0.9rem; }
+        .markdown-body th { background: #f1f5f9; color: #1e293b; font-weight: 600; text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid #cbd5e1; }
+        .markdown-body td { padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0; color: #475569; }
+        .markdown-body tr:hover td { background-color: #f8fafc; }
+        
+        .loader {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #0d9488;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .tab-active { border-bottom: 3px solid #0d9488; color: #0d9488; font-weight: 600; }
+        .tab-inactive { color: #64748b; border-bottom: 3px solid transparent; }
+        .tab-inactive:hover { color: #1e293b; border-color: #e2e8f0; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Pulsing voice wave bars */
+        .wave-bar {
+            width: 3px;
+            height: 12px;
+            background-color: #0d9488;
+            border-radius: 1px;
+            animation: bounce 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes bounce {
+            0% { transform: scaleY(0.4); }
+            100% { transform: scaleY(1.8); }
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col bg-slate-50 text-slate-800 overflow-hidden antialiased">
+
+    <!-- Header / Nav in ArxivLLM style -->
+    <header class="h-16 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 z-20 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-brand-600 to-teal-500 text-white p-2.5 rounded-xl shadow-md shadow-brand-500/10">
+                <i class="fa-solid fa-file-shield text-base"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold text-lg tracking-tight text-slate-900">Auditor LLM</h1>
+                    <span class="bg-brand-50 border border-brand-100 text-brand-700 text-[10px] px-2 py-0.5 rounded-full font-semibold">Pro Enterprise</span>
+                </div>
+                <p class="text-[10px] text-slate-400 font-medium">Notebook AI for Audit, Risk, and Compliance Analysts</p>
+            </div>
+        </div>
+        
+        <!-- Authentic ArxivLLM API Key configuration bar -->
+        <div class="flex items-center gap-3">
+            <div id="auth-status-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-xs font-semibold transition-colors">
+                <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse" id="status-dot"></span>
+                <span id="status-text">Keys Pending</span>
+            </div>
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-shield-halved absolute left-3 text-slate-400 text-sm"></i>
+                <input type="password" id="api-key" placeholder="Enter Gemini Pro API Key..." 
+                    class="pl-9 pr-10 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white w-72 transition-all shadow-inner"
+                    onchange="saveApiKey()">
+                <button onclick="toggleKeyVisibility()" class="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors">
+                    <i id="key-toggle-icon" class="fa-solid fa-eye text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace in 3-Column ArxivLLM Style -->
+    <div class="flex-1 flex overflow-hidden w-full">
+        
+        <!-- LEFT PANEL: Sources, Upload, Actions -->
+        <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-sm">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-bars-staggered mr-1.5"></i> Control Desk</h2>
+                <span id="word-count" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium hidden">0 words</span>
+            </div>
+            
+            <div class="p-5 overflow-y-auto flex-1 space-y-6">
+                
+                <!-- Report Type Selection -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Audit Focus / Category</label>
+                    <div class="relative">
+                        <select id="report-type" class="w-full appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-300 text-slate-800 py-2.5 px-3.5 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white text-sm font-semibold transition-all shadow-sm">
+                            <option value="Financial Report">Financial Audit / Balance Sheet</option>
+                            <option value="Employee Report">Employee / HR Compliance</option>
+                            <option value="Compliance Report">Compliance & Regulatory Standards</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
+                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload Box -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Document Ingestion</label>
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:bg-slate-100/50 hover:border-brand-500 transition-all cursor-pointer relative group" onclick="document.getElementById('file-upload').click()">
+                        <div class="h-10 w-10 bg-white rounded-lg border shadow-sm flex items-center justify-center mx-auto mb-2 text-brand-600 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-800">Choose file or drop here</p>
+                        <p class="text-[10px] text-slate-400 mt-1 font-medium">PDF, Excel, Word, CSV, Image</p>
+                        <input type="file" id="file-upload" class="hidden" accept=".pdf,.xlsx,.xls,.csv,.doc,.docx,.txt,image/*" onchange="handleFileUpload(event)">
+                    </div>
+                    
+                    <div id="file-status" class="hidden text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border transition-all">
+                        <i class="fa-solid fa-circle-check mt-0.5" id="file-status-icon"></i>
+                        <span id="file-status-text" class="break-all font-medium">No file ingested.</span>
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Advanced Analytics Reports -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Intelligence Synthesis</label>
+                    <div class="space-y-2">
+                        <select id="custom-format" class="w-full bg-slate-50 border border-slate-300 text-slate-700 py-2 px-3 rounded-lg focus:outline-none text-xs font-medium focus:bg-white focus:ring-2 focus:ring-brand-500 shadow-sm">
+                            <option value="Executive Summary">Executive Briefing Summary</option>
+                            <option value="Risk Assessment">Risk Assessment Matrix</option>
+                            <option value="Action Plan">Action Plan & Recommendations</option>
+                            <option value="Audit Findings">Detailed Audit Finding Sheet</option>
+                        </select>
+                        <button onclick="generateCustomReport()" class="w-full bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm shadow-brand-600/10">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Synthesize Insight
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Structured Visualizations -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Graphic Knowledge Base</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="generateVisual('mindmap')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-diagram-project text-indigo-500 text-sm"></i> Concept Map
+                        </button>
+                        <button onclick="generateVisual('graph')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-chart-network text-emerald-500 text-sm"></i> Process Map
+                        </button>
+                    </div>
+                    <button onclick="generatePresentation()" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-chalkboard-user"></i> Form Presentation Slides
+                    </button>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- MIDDLE PANEL: Document Viewer Workspace (With Fix Strict Bounds & Borders) -->
+        <main class="flex-1 min-w-[480px] flex flex-col bg-slate-100 border-l border-r border-slate-200 overflow-hidden relative">
+            
+            <!-- Document View Control Ribbon -->
+            <div class="h-14 border-b border-slate-200 flex px-6 gap-6 bg-white justify-between items-center shrink-0">
+                <div class="flex gap-6 items-end h-full">
+                    <button onclick="switchTab('document')" id="tab-document" class="tab-btn tab-active pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Document Text</button>
+                    <button onclick="switchTab('report')" id="tab-report" class="tab-btn tab-inactive pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Synthesized Report</button>
+                    <button onclick="switchTab('visual')" id="tab-visual" class="tab-btn tab-inactive pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Visuals & Slides</button>
+                </div>
+
+                <!-- Document utilities directly integrated into Viewer Panel -->
+                <div id="middle-tools" class="flex items-center gap-3 invisible">
+                    <!-- Translate utility -->
+                    <div class="flex items-center gap-1 bg-slate-100 border border-slate-300 rounded-lg px-2 py-1 shadow-inner">
+                        <i class="fa-solid fa-language text-slate-500 text-xs"></i>
+                        <select id="target-language" class="bg-transparent border-none text-slate-700 py-0.5 px-1 text-xs font-semibold focus:outline-none">
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Hindi">Hindi</option>
+                        </select>
+                        <button onclick="translateDocument()" class="hover:bg-slate-200 text-slate-700 p-1 rounded text-[10px] font-bold transition-colors">
+                            Apply
+                        </button>
+                    </div>
+
+                    <!-- Voice Audio Playback -->
+                    <div class="h-8 border-l border-slate-300/60"></div>
+                    <button onclick="toggleAudio()" id="audio-btn" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
+                        <span class="flex items-center gap-0.5" id="audio-wave" style="display:none;">
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar" style="animation-delay: 0.15s"></span>
+                            <span class="wave-bar" style="animation-delay: 0.3s"></span>
+                        </span>
+                        <i class="fa-solid fa-volume-high text-brand-600" id="audio-btn-icon"></i>
+                        <span id="audio-btn-text">Read Text</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Global Action / Progress Overlay -->
+            <div id="global-loader" class="hidden absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] z-50 flex flex-col items-center justify-center">
+                <div class="bg-white px-8 py-6 rounded-2xl shadow-xl border flex flex-col items-center max-w-sm text-center">
+                    <div class="loader mb-4 h-12 w-12 border-4"></div>
+                    <p id="loader-text" class="text-slate-800 font-bold text-sm">Accessing Intelligence Layer...</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Please wait. Processing using Gemini Pro agent architecture.</p>
+                </div>
+            </div>
+
+            <!-- Panel Contents -->
+            <div class="flex-1 overflow-y-auto relative p-6">
+                
+                <!-- DOCUMENT TAB -->
+                <div id="pane-document" class="pane h-full">
+                    <div class="max-w-3xl mx-auto h-full">
+                        <div id="empty-state-doc" class="flex flex-col items-center justify-center text-center h-full py-20">
+                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-file-invoice text-2xl text-slate-400"></i>
+                            </div>
+                            <h2 class="text-base font-bold text-slate-800">No Document Ingested Yet</h2>
+                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">To begin your audit workspace, upload your document in the control panel on the left.</p>
+                        </div>
+                        <div id="doc-content" class="markdown-body hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm min-h-full leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <!-- REPORT TAB -->
+                <div id="pane-report" class="pane hidden h-full">
+                    <div class="max-w-3xl mx-auto">
+                        <div id="empty-state-report" class="flex flex-col items-center justify-center text-center py-20">
+                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-file-circle-check text-2xl text-slate-400"></i>
+                            </div>
+                            <h2 class="text-base font-bold text-slate-800">Synthesized Findings Queue</h2>
+                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">Configure a target template on the left and trigger report synthesis.</p>
+                        </div>
+                        <div class="flex justify-between items-center mb-4 hidden" id="report-actions">
+                            <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-brand-600"></i> SYNTHESIS SECURED</span>
+                            <button onclick="copyToClipboard('report-content-body')" class="text-xs text-slate-600 hover:text-brand-600 flex items-center gap-1.5 bg-white border px-3 py-1.5 rounded-lg shadow-sm font-semibold hover:border-brand-200 transition-all">
+                                <i class="fa-regular fa-copy text-xs"></i> Copy Clean Text
+                            </button>
+                        </div>
+                        <div id="report-content" class="markdown-body hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm">
+                            <div id="report-content-body"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISUALS & SLIDES TAB -->
+                <div id="pane-visual" class="pane hidden h-full">
+                    <div class="max-w-3xl mx-auto space-y-6">
+                        <div id="empty-state-visual" class="flex flex-col items-center justify-center text-center py-20">
+                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-chart-gantt text-2xl text-slate-400"></i>
+                            </div>
+                            <h2 class="text-base font-bold text-slate-800">Visualization and Presentation Deck</h2>
+                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">Create custom diagrams, workflow processes, or automated slides using the control desk tools.</p>
+                        </div>
+                        
+                        <!-- Mermaid diagram output panel -->
+                        <div id="mermaid-container" class="hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+                            <span class="text-xs font-bold text-slate-400 self-start mb-4 uppercase tracking-widest"><i class="fa-solid fa-diagram-project mr-1 text-brand-600"></i> Rendered Process Model</span>
+                            <div id="mermaid-output" class="w-full flex justify-center"></div>
+                        </div>
+
+                        <!-- Presentation display panel -->
+                        <div id="presentation-container" class="hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm">
+                            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-desktop mr-1 text-brand-600"></i> Slide Deck Preview</span>
+                                <button onclick="playPresentationAudio()" id="pres-audio-btn" class="bg-brand-50 text-brand-700 border border-brand-200 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-100 flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-circle-play"></i> <span id="pres-audio-text">Read Slide Deck</span>
+                                </button>
+                            </div>
+                            <div id="presentation-content" class="markdown-body"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Dedicated Auditor AI Chat Agent (ArxivLLM Style Sidebar Chat with Clean Dividing Left Border) -->
+        <aside class="w-96 bg-white flex flex-col shrink-0 z-10 border-l border-slate-200 shadow-lg">
+            
+            <!-- Chat Agent Status Header -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shadow-md shadow-brand-500/20">
+                            <i class="fa-solid fa-robot text-white text-xs"></i>
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-800">Audit AI Agent</h3>
+                        <p class="text-[9px] text-slate-400 font-medium">Interactive document chat context active</p>
+                    </div>
+                </div>
+                <button onclick="clearChat()" class="text-slate-400 hover:text-slate-600 p-1 rounded transition-colors" title="Clear History">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+
+            <!-- Quick Agent Prompts Selection -->
+            <div class="p-3 bg-slate-50 border-b border-slate-100 flex gap-2 overflow-x-auto shrink-0 scrollbar-none" id="suggestions-box">
+                <button onclick="applyPrompt('Summarize key financial and regulatory risks you find.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
+                    ⚠️ Summarize Risks
+                </button>
+                <button onclick="applyPrompt('Check this document for non-compliance elements or deviations from common standards.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
+                    ⚖️ Compliance Audit
+                </button>
+                <button onclick="applyPrompt('Analyze the balance indicators, financials, or HR stats from this report and summarize.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
+                    📊 Analyze Metrics
+                </button>
+            </div>
+
+            <!-- Chat History Area -->
+            <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-600 text-xs"></i>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
+                        <p class="text-xs text-slate-700 leading-relaxed font-medium">Hello, Analyst! Ingest an audit file and write or click any prompt to trigger analysis on the active source context.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="p-4 bg-white border-t border-slate-100">
+                <div class="relative flex items-center">
+                    <textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-12 py-3 text-xs focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 resize-none transition-all shadow-inner focus:outline-none leading-relaxed text-slate-800" placeholder="Ask a question about this document..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"></textarea>
+                    <button onclick="sendChatMessage()" class="absolute right-3.5 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center hover:bg-brand-700 transition-all hover:scale-105 shadow-md shadow-brand-500/10">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Script Layer -->
+    <script>
+        // --- Setup and State ---
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+        
+        let appState = {
+            apiKey: localStorage.getItem('auditor_api_key') || '',
+            documentText: '',
+            reportType: 'Financial Report',
+            isSpeaking: false,
+            speechUtterance: null,
+            presentationText: ''
+        };
+
+        // Initialize API status indicator
+        if (appState.apiKey) {
+            document.getElementById('api-key').value = appState.apiKey;
+            updateStatusBadge(true);
+        } else {
+            updateStatusBadge(false);
+        }
+
+        function updateStatusBadge(configured) {
+            const badge = document.getElementById('auth-status-badge');
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            
+            if (configured) {
+                badge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold transition-colors";
+                dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
+                text.innerText = "Gemini Connected";
+            } else {
+                badge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-xs font-semibold transition-colors";
+                dot.className = "h-2 w-2 rounded-full bg-rose-500 animate-pulse";
+                text.innerText = "Keys Pending";
+            }
+        }
+
+        function toggleKeyVisibility() {
+            const input = document.getElementById('api-key');
+            const icon = document.getElementById('key-toggle-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = "fa-solid fa-eye-slash text-xs";
+            } else {
+                input.type = 'password';
+                icon.className = "fa-solid fa-eye text-xs";
+            }
+        }
+
+        function saveApiKey() {
+            appState.apiKey = document.getElementById('api-key').value.trim();
+            localStorage.setItem('auditor_api_key', appState.apiKey);
+            updateStatusBadge(!!appState.apiKey);
+        }
+
+        // --- Workspace View Switches ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('tab-inactive');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
+            document.getElementById(`tab-${tabId}`).classList.remove('tab-inactive');
+
+            document.querySelectorAll('.pane').forEach(pane => pane.classList.add('hidden'));
+            document.getElementById(`pane-${tabId}`).classList.remove('hidden');
+        }
+
+        // Keep document layout clean from overlaps on tab switch
+        window.addEventListener('resize', () => {
+            // Re-draw any visible mermaid diagram to preserve dynamic canvas scaling 
+            const container = document.getElementById('mermaid-container');
+            if (container && !container.classList.contains('hidden')) {
+                // Wait briefly for style calculations to finish
+                setTimeout(() => {
+                    const type = document.querySelector('.tab-active').innerText.includes('Visuals') ? 'rendered' : '';
+                    if (type) {
+                        // Triggers clean-up/re-render if necessary
+                    }
+                }, 150);
+            }
+        });
+
+        function showLoader(message = "Extracting knowledge structures...") {
+            document.getElementById('loader-text').innerText = message;
+            document.getElementById('global-loader').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.getElementById('global-loader').classList.add('hidden');
+        }
+
+        function updateDocView(text, isMarkdown = false) {
+            appState.documentText = text;
+            
+            // Statistics updates
+            const words = text.trim().split(/\s+/).filter(Boolean).length;
+            const wordCountBadge = document.getElementById('word-count');
+            wordCountBadge.innerText = `${words} words`;
+            wordCountBadge.classList.remove('hidden');
+
+            document.getElementById('empty-state-doc').classList.add('hidden');
+            const contentDiv = document.getElementById('doc-content');
+            contentDiv.classList.remove('hidden');
+            
+            contentDiv.innerHTML = isMarkdown ? marked.parse(text) : `<pre class="whitespace-pre-wrap font-sans text-sm text-slate-700 leading-relaxed">${escapeHtml(text)}</pre>`;
+            document.getElementById('middle-tools').classList.remove('invisible');
+            switchTab('document');
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        // --- File Parsers ---
+        if (typeof window.pdfjsLib !== 'undefined') {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusEl = document.getElementById('file-status');
+            const statusText = document.getElementById('file-status-text');
+            const statusIcon = document.getElementById('file-status-icon');
+            
+            statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-amber-50 text-amber-700 border-amber-100 transition-all";
+            statusIcon.className = "fa-solid fa-spinner animate-spin mt-0.5";
+            statusText.innerText = `Ingesting: ${file.name}...`;
+            statusEl.classList.remove('hidden');
+
+            try {
+                const ext = file.name.split('.').pop().toLowerCase();
+                let text = "";
+
+                if (['txt', 'csv'].includes(ext)) {
+                    text = await file.text();
+                } else if (file.type.startsWith('image/')) {
+                    statusText.innerText = `Performing Deep OCR with Gemini...`;
+                    text = await extractTextFromImage(file);
+                } else if (ext === 'pdf' && typeof window.pdfjsLib !== 'undefined') {
+                    text = await extractTextFromPDF(file);
+                } else if (['xlsx', 'xls'].includes(ext) && typeof XLSX !== 'undefined') {
+                    text = await extractTextFromExcel(file);
+                } else if (['doc', 'docx'].includes(ext) && typeof mammoth !== 'undefined') {
+                    text = await extractTextFromWord(file);
+                } else {
+                    throw new Error("Target file format or library is unsupported.");
+                }
+
+                if (!text || text.trim().length === 0) throw new Error("Could not extract any content from the document.");
+                
+                statusText.innerText = `Successfully loaded ${file.name}`;
+                statusIcon.className = "fa-solid fa-circle-check mt-0.5";
+                statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-green-50 text-green-700 border-green-100 transition-all";
+                
+                updateDocView(text);
+
+            } catch (err) {
+                console.error(err);
+                statusText.innerText = `Failure: ${err.message}`;
+                statusIcon.className = "fa-solid fa-circle-exclamation mt-0.5";
+                statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-rose-50 text-rose-700 border-rose-100 transition-all";
+            }
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            let text = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const strings = content.items.map(item => item.str);
+                text += strings.join(" ") + "\n\n";
+            }
+            return text;
+        }
+
+        async function extractTextFromExcel(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, {type: 'array'});
+            let text = "";
+            workbook.SheetNames.forEach(sheetName => {
+                const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+                text += `--- Sheet Focus: ${sheetName} ---\n${csv}\n\n`;
+            });
+            return text;
+        }
+
+        async function extractTextFromWord(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+            return result.value;
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve({
+                        mimeType: file.type,
+                        data: base64String
+                    });
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function extractTextFromImage(file) {
+            const inlineData = await fileToBase64(file);
+            const prompt = "Transcribe the structural text contents in this auditor image cleanly. Standardize metrics and structures.";
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: prompt },
+                        { inlineData: inlineData }
+                    ]
+                }]
+            };
+
+            showLoader("Decrypting Document Image...");
+            try {
+                const result = await fetchGeminiAPI(payload);
+                hideLoader();
+                return result;
+            } catch (err) {
+                hideLoader();
+                throw err;
+            }
+        }
+
+        // --- Core Gemini API Handling with Smart Cascading Model Fallbacks ---
+        async function fetchGeminiAPI(payload) {
+            if (!appState.apiKey) {
+                alert("Provide a valid Gemini API Key to complete workspace configuration.");
+                throw new Error("No API Key Provided");
+            }
+
+            // Order of preference: stable general model, system default preview model, older fallback models
+            const modelsToTry = ['gemini-2.5-flash', 'gemini-2.5-flash-preview-09-2025', 'gemini-1.5-flash'];
+            let lastError = null;
+
+            for (const model of modelsToTry) {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${appState.apiKey}`;
+                let retries = 3;
+                let delay = 1000;
+
+                while (retries > 0) {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            const errData = await response.json();
+                            const errMsg = errData.error?.message || "";
+                            
+                            // If model is explicitly missing or not found on this API account, try next model in loop directly
+                            if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('not supported') || errMsg.includes('unregistered')) {
+                                lastError = new Error(errMsg || `Model ${model} not available`);
+                                retries = 0; // stop retrying this specific model
+                                break; 
+                            }
+                            throw new Error(errMsg || `Status issue: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                            return data.candidates[0].content.parts[0].text;
+                        } else {
+                            throw new Error("Received anomalous interface structures from Gemini API.");
+                        }
+                        
+                    } catch (error) {
+                        retries--;
+                        lastError = error;
+                        if (retries === 0) {
+                            break; // break retry loop to try the next model option
+                        }
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+
+            // If we fall through all models without success, alert and throw error
+            alert(`API Configuration Fail: ${lastError.message}`);
+            throw lastError;
+        }
+
+        function buildPayload(prompt, systemPrompt = "You are Auditor LLM, a specialist workspace intelligence engine.") {
+            return {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+        }
+
+        function checkDoc() {
+            if (!appState.documentText) {
+                alert("Please upload an audit-focused document template to begin.");
+                return false;
+            }
+            return true;
+        }
+
+        // --- Core Intelligence Synthesis Tools ---
+
+        async function translateDocument() {
+            if (!checkDoc()) return;
+            const targetLang = document.getElementById('target-language').value;
+            const prompt = `Translate the subsequent document directly into ${targetLang}. Preserve critical layout metrics.\n\nDocument:\n${appState.documentText.substring(0, 30000)}`;
+            
+            showLoader(`Translating report into ${targetLang}...`);
+            try {
+                const translated = await fetchGeminiAPI(buildPayload(prompt, "You are a professional auditor and structural business translator. Translate layout models cleanly."));
+                updateDocView(translated, false);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function generateCustomReport() {
+            if (!checkDoc()) return;
+            const format = document.getElementById('custom-format').value;
+            const reportType = document.getElementById('report-type').value;
+            
+            const prompt = `Conduct a rigorous analytical audit synthesis to generate a structural "${format}" based on the ingested ${reportType}. 
+            Format the output using professional markdown structure. Highlight risk variances and regulatory implications.
+            
+            Source Core Context:
+            ${appState.documentText.substring(0, 30000)}
+            `;
+
+            showLoader(`Synthesizing ${format}...`);
+            try {
+                const reportMd = await fetchGeminiAPI(buildPayload(prompt));
+                
+                document.getElementById('empty-state-report').classList.add('hidden');
+                document.getElementById('report-actions').classList.remove('hidden');
+                const contentDiv = document.getElementById('report-content');
+                contentDiv.classList.remove('hidden');
+                document.getElementById('report-content-body').innerHTML = marked.parse(reportMd);
+                
+                switchTab('report');
+            } catch (e) {
+                console.error(e);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function generateVisual(type) {
+             if (!checkDoc()) return;
+             const reportType = document.getElementById('report-type').value;
+
+             let prompt = "";
+             if (type === 'mindmap') {
+                 prompt = `Develop a structurally optimized Mermaid.js Mindmap of primary issues, processes, and entities found in this ${reportType}.
+                 
+                 CRITICAL MERMAID SYNTAX RULES:
+                 1. All node text/labels MUST be enclosed in double quotes, e.g., id("Node Text Here") or id["Node Text Here"].
+                 2. NEVER put raw parentheses () or brackets [] inside node labels unless wrapped in double quotes. E.g., Use id["Financial Statements (2021)"] instead of id[Financial Statements (2021)] or id(Financial Statements).
+                 3. Avoid any markdown bold/italic inside node labels.
+                 4. Return ONLY a valid Mermaid.js block starting with "mindmap". Avoid markdown wrappers around the mermaid block.
+                 
+                 Context: ${appState.documentText.substring(0, 20000)}`;
+             } else {
+                 prompt = `Develop a logical Mermaid.js flow diagram (graph TD) showing process dependencies, issues, or entity links inside this ${reportType}.
+                 
+                 CRITICAL MERMAID SYNTAX RULES:
+                 1. All node text/labels MUST be enclosed in double quotes, e.g., A["Node Text Here"] or B("Another Text").
+                 2. NEVER put raw parentheses () or brackets [] inside node labels unless wrapped in double quotes. E.g., Use A["Financial Statements (2021)"] instead of A[Financial Statements (2021)] or A(Financial Statements).
+                 3. Do not use special characters or punctuation in node IDs (use simple alphanumeric IDs like A, B, C, node1, node2). Only apply text labels using quotes.
+                 4. Return ONLY a valid Mermaid.js block starting with "graph TD". Avoid markdown wrappers around the mermaid block.
+                 
+                 Context: ${appState.documentText.substring(0, 20000)}`;
+             }
+
+             showLoader(`Drafting logic map (${type})...`);
+             try {
+                const responseText = await fetchGeminiAPI(buildPayload(prompt, "You are an expert diagrams compiler. You output ONLY valid, flawless Mermaid.js syntax. You strictly adhere to escaping rules, using double quotes for all node labels (e.g., A[\"Label\"]) to prevent parser crashes. No explanations."));
+                
+                const match = responseText.match(/```mermaid\n([\s\S]*?)```/) || responseText.match(/```\n([\s\S]*?)```/);
+                let mermaidCode = match ? match[1] : responseText.replace(/```mermaid/g, '').replace(/```/g, '');
+                
+                document.getElementById('empty-state-visual').classList.add('hidden');
+                const container = document.getElementById('mermaid-container');
+                container.classList.remove('hidden');
+                document.getElementById('presentation-container').classList.add('hidden');
+                
+                const outputDiv = document.getElementById('mermaid-output');
+                outputDiv.innerHTML = '';
+                
+                try {
+                    const { svg } = await mermaid.render(`mermaid-rendered-${Date.now()}`, mermaidCode.trim());
+                    outputDiv.innerHTML = svg;
+                    switchTab('visual');
+                } catch(renderErr) {
+                    console.error("Syntax rendering issue:", renderErr);
+                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold">Failed to build conceptual process maps due to syntax variations. Raw model code:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-3 font-mono rounded overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
+                    switchTab('visual');
+                }
+
+             } catch (e) {
+                 console.error(e);
+             } finally {
+                 hideLoader();
+             }
+        }
+
+        async function generatePresentation() {
+             if (!checkDoc()) return;
+             
+             const prompt = `Draft a high-level PowerPoint presentation slide deck structure representing the compliance or financial metrics.
+             Use \`# Slide [Number]: [Title]\` as standard layout slide heads. Use crisp bullets.
+             Include \`> Speaker Notes: ...\` blocks on each slide.
+             Source details: ${appState.documentText.substring(0, 25000)}`;
+
+             showLoader("Designing Professional Deck...");
+             try {
+                const presMd = await fetchGeminiAPI(buildPayload(prompt, "You are a professional slide designer."));
+                appState.presentationText = presMd;
+                
+                document.getElementById('empty-state-visual').classList.add('hidden');
+                document.getElementById('mermaid-container').classList.add('hidden');
+                const presContainer = document.getElementById('presentation-container');
+                presContainer.classList.remove('hidden');
+                
+                document.getElementById('presentation-content').innerHTML = marked.parse(presMd);
+                switchTab('visual');
+
+             } catch (e) {
+                 console.error(e);
+             } finally {
+                 hideLoader();
+             }
+        }
+
+        // --- Interactive Auditor Chat Agent ---
+        let chatHistoryArray = [];
+
+        function clearChat() {
+            chatHistoryArray = [];
+            const container = document.getElementById('chat-history');
+            container.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-600 text-xs"></i>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
+                        <p class="text-xs text-slate-700 leading-relaxed font-medium">History cleared. Provide active document parameters below to query the model.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyPrompt(promptText) {
+            document.getElementById('chat-input').value = promptText;
+            sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const message = inputEl.value.trim();
+            if (!message) return;
+            if (!checkDoc()) {
+                inputEl.value = '';
+                return;
+            }
+
+            appendMessage('user', message);
+            inputEl.value = '';
+            
+            let historyText = chatHistoryArray.map(m => `${m.role}: ${m.content}`).join("\n");
+            
+            const prompt = `
+            Context Report:
+            ${appState.documentText.substring(0, 25000)}
+
+            Chat History:
+            ${historyText}
+
+            User Question: ${message}
+            
+            Act as an elite expert auditor. Provide structured, evidence-grounded responses in professional tone. Use bold highlights or markdown formatting for table models or critical findings.
+            `;
+
+            appendMessage('system', '<div class="loader inline-block h-3.5 w-3.5 border-2"></div> Assessing Audit Context...', 'loading-msg');
+            
+            try {
+                const response = await fetchGeminiAPI(buildPayload(prompt, "You are Auditor LLM, a rigorous AI intelligence engine."));
+                document.getElementById('loading-msg').remove();
+                
+                appendMessage('agent', response);
+                chatHistoryArray.push({role: 'User', content: message});
+                chatHistoryArray.push({role: 'Agent', content: response});
+                
+            } catch (e) {
+                const loader = document.getElementById('loading-msg');
+                if (loader) loader.remove();
+                appendMessage('system', `<span class="text-rose-500">Error response: ${e.message}</span>`);
+            }
+        }
+
+        function appendMessage(role, content, id = null) {
+            const container = document.getElementById('chat-history');
+            const div = document.createElement('div');
+            if (id) div.id = id;
+            
+            if (role === 'user') {
+                div.className = "flex items-start gap-3 justify-end";
+                div.innerHTML = `
+                    <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+                        <p class="text-xs leading-relaxed font-medium">${escapeHtml(content)}</p>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 shadow-sm">
+                        <i class="fa-solid fa-user text-white text-[10px]"></i>
+                    </div>
+                `;
+            } else if (role === 'agent' || role === 'system') {
+                div.className = "flex items-start gap-3";
+                div.innerHTML = `
+                    <div class="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot text-white text-[10px]"></i>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] text-xs text-slate-800 markdown-body leading-relaxed">
+                        ${role === 'agent' ? marked.parse(content) : content}
+                    </div>
+                `;
+            }
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- Document and presentation TTS integration ---
+
+        function toggleAudio() {
+            if (!checkDoc()) return;
+            const btnText = document.getElementById('audio-btn-text');
+            const btnIcon = document.getElementById('audio-btn-icon');
+            const wave = document.getElementById('audio-wave');
+            
+            if (appState.isSpeaking) {
+                window.speechSynthesis.cancel();
+                appState.isSpeaking = false;
+                btnText.innerText = "Read Text";
+                btnIcon.className = "fa-solid fa-volume-high text-brand-600";
+                wave.style.display = "none";
+            } else {
+                readTextChunks(appState.documentText);
+                appState.isSpeaking = true;
+                btnText.innerText = "Stop Reading";
+                btnIcon.className = "fa-solid fa-circle-stop text-rose-500";
+                wave.style.display = "inline-flex";
+            }
+        }
+
+        function playPresentationAudio() {
+             if (!appState.presentationText) return;
+             const btnText = document.getElementById('pres-audio-text');
+             
+             if (appState.isSpeaking) {
+                window.speechSynthesis.cancel();
+                appState.isSpeaking = false;
+                btnText.innerText = "Read Slide Deck";
+            } else {
+                const cleanText = appState.presentationText.replace(/[#*`>]/g, '');
+                readTextChunks(cleanText, () => {
+                    appState.isSpeaking = false;
+                    btnText.innerText = "Read Slide Deck";
+                });
+                appState.isSpeaking = true;
+                btnText.innerText = "Stop Reading Slides";
+            }
+        }
+
+        function readTextChunks(text, onComplete) {
+            window.speechSynthesis.cancel();
+            
+            const chunks = text.match(/[\s\S]{1,200}(?!\S)|[\s\S]{1,200}/g) || [];
+            let i = 0;
+
+            function speakNext() {
+                if (i >= chunks.length || !appState.isSpeaking) {
+                    if(onComplete) onComplete();
+                    else {
+                        appState.isSpeaking = false;
+                        document.getElementById('audio-btn-text').innerText = "Read Text";
+                        document.getElementById('audio-btn-icon').className = "fa-solid fa-volume-high text-brand-600";
+                        document.getElementById('audio-wave').style.display = "none";
+                    }
+                    return;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(chunks[i]);
+                utterance.rate = 1.05;
+                utterance.onend = () => {
+                    i++;
+                    speakNext();
+                };
+                utterance.onerror = (e) => { console.error('TTS Error', e); };
+                window.speechSynthesis.speak(utterance);
+            }
+            speakNext();
+        }
+
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            const text = el.innerText;
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            alert("Synthesized report text copied to workspace clipboard.");
+        }
+
+    </script>
+</body>
+</html>
