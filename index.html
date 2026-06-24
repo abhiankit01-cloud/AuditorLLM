@@ -126,7 +126,7 @@
             </div>
             <div class="relative flex items-center">
                 <i class="fa-solid fa-shield-halved absolute left-3 text-slate-400 text-sm"></i>
-                <input type="password" id="api-key" placeholder="Enter Gemini Pro API Key..." 
+                <input type="password" id="api-key" placeholder="Enter Gemini API Key..." 
                     class="pl-9 pr-10 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white w-72 transition-all shadow-inner"
                     onchange="saveApiKey()">
                 <button onclick="toggleKeyVisibility()" class="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors">
@@ -137,22 +137,23 @@
     </header>
 
     <!-- Main Workspace in 3-Column ArxivLLM Style -->
-    <div class="flex-1 flex overflow-hidden w-full">
+    <!-- flex-1 ensures it takes remaining vertical height, overflow-hidden keeps it contained -->
+    <div class="flex-1 flex overflow-hidden w-full relative">
         
-        <!-- LEFT PANEL: Sources, Upload, Actions -->
-        <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-sm">
-            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-bars-staggered mr-1.5"></i> Control Desk</h2>
-                <span id="word-count" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium hidden">0 words</span>
+        <!-- LEFT PANEL: Sources, Upload, Actions (Fixed Width) -->
+        <aside class="w-[300px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-[2px_0_10px_-5px_rgba(0,0,0,0.1)]">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                <h2 class="text-xs font-bold text-slate-600 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-1.5 text-brand-600"></i> Control Desk</h2>
+                <span id="word-count" class="text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold hidden shadow-sm">0 words</span>
             </div>
             
             <div class="p-5 overflow-y-auto flex-1 space-y-6">
                 
                 <!-- Report Type Selection -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Audit Focus / Category</label>
+                    <label class="block text-[11px] font-bold text-slate-500 tracking-wide uppercase">Audit Focus / Category</label>
                     <div class="relative">
-                        <select id="report-type" class="w-full appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-300 text-slate-800 py-2.5 px-3.5 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white text-sm font-semibold transition-all shadow-sm">
+                        <select id="report-type" class="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 py-2.5 px-3.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm font-semibold transition-all shadow-sm">
                             <option value="Financial Report">Financial Audit / Balance Sheet</option>
                             <option value="Employee Report">Employee / HR Compliance</option>
                             <option value="Compliance Report">Compliance & Regulatory Standards</option>
@@ -165,52 +166,54 @@
 
                 <!-- File Upload Box -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Document Ingestion</label>
-                    <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:bg-slate-100/50 hover:border-brand-500 transition-all cursor-pointer relative group" onclick="document.getElementById('file-upload').click()">
-                        <div class="h-10 w-10 bg-white rounded-lg border shadow-sm flex items-center justify-center mx-auto mb-2 text-brand-600 group-hover:scale-110 transition-transform">
+                    <label class="block text-[11px] font-bold text-slate-500 tracking-wide uppercase">Document Ingestion</label>
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:bg-slate-100/80 hover:border-brand-500 transition-all cursor-pointer relative group" onclick="document.getElementById('file-upload').click()">
+                        <div class="h-10 w-10 bg-white rounded-xl border shadow-sm flex items-center justify-center mx-auto mb-3 text-brand-600 group-hover:scale-110 transition-transform duration-300">
                             <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
                         </div>
-                        <p class="text-xs font-semibold text-slate-800">Choose file or drop here</p>
+                        <p class="text-xs font-bold text-slate-700">Choose file or drop here</p>
                         <p class="text-[10px] text-slate-400 mt-1 font-medium">PDF, Excel, Word, CSV, Image</p>
                         <input type="file" id="file-upload" class="hidden" accept=".pdf,.xlsx,.xls,.csv,.doc,.docx,.txt,image/*" onchange="handleFileUpload(event)">
                     </div>
                     
-                    <div id="file-status" class="hidden text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border transition-all">
+                    <div id="file-status" class="hidden text-xs p-3 rounded-xl flex items-start gap-2.5 shadow-sm border transition-all mt-2">
                         <i class="fa-solid fa-circle-check mt-0.5" id="file-status-icon"></i>
-                        <span id="file-status-text" class="break-all font-medium">No file ingested.</span>
+                        <span id="file-status-text" class="break-all font-medium leading-relaxed">No file ingested.</span>
                     </div>
                 </div>
 
-                <hr class="border-slate-100">
+                <hr class="border-slate-200">
 
                 <!-- Advanced Analytics Reports -->
                 <div class="space-y-3">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Intelligence Synthesis</label>
+                    <label class="block text-[11px] font-bold text-slate-500 tracking-wide uppercase">Intelligence Synthesis</label>
                     <div class="space-y-2">
-                        <select id="custom-format" class="w-full bg-slate-50 border border-slate-300 text-slate-700 py-2 px-3 rounded-lg focus:outline-none text-xs font-medium focus:bg-white focus:ring-2 focus:ring-brand-500 shadow-sm">
+                        <select id="custom-format" class="w-full bg-white border border-slate-300 text-slate-700 py-2.5 px-3 rounded-xl focus:outline-none text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:border-brand-500 shadow-sm transition-all">
                             <option value="Executive Summary">Executive Briefing Summary</option>
                             <option value="Risk Assessment">Risk Assessment Matrix</option>
                             <option value="Action Plan">Action Plan & Recommendations</option>
                             <option value="Audit Findings">Detailed Audit Finding Sheet</option>
                         </select>
-                        <button onclick="generateCustomReport()" class="w-full bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm shadow-brand-600/10">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Synthesize Insight
+                        <button onclick="generateCustomReport()" class="w-full bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md">
+                            <i class="fa-solid fa-wand-magic-sparkles text-brand-400"></i> Synthesize Insight
                         </button>
                     </div>
                 </div>
 
                 <!-- Structured Visualizations -->
                 <div class="space-y-3">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">Graphic Knowledge Base</label>
+                    <label class="block text-[11px] font-bold text-slate-500 tracking-wide uppercase">Graphic Knowledge Base</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="generateVisual('mindmap')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-diagram-project text-indigo-500 text-sm"></i> Concept Map
+                        <button onclick="generateVisual('mindmap')" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-xl text-[11px] font-bold transition-all flex flex-col items-center gap-2 shadow-sm hover:border-indigo-300 hover:shadow-indigo-100">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-diagram-project text-indigo-500 text-sm"></i></div>
+                            Concept Map
                         </button>
-                        <button onclick="generateVisual('graph')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-chart-network text-emerald-500 text-sm"></i> Process Map
+                        <button onclick="generateVisual('graph')" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-xl text-[11px] font-bold transition-all flex flex-col items-center gap-2 shadow-sm hover:border-emerald-300 hover:shadow-emerald-100">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i class="fa-solid fa-chart-network text-emerald-500 text-sm"></i></div>
+                            Process Map
                         </button>
                     </div>
-                    <button onclick="generatePresentation()" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-md">
+                    <button onclick="generatePresentation()" class="w-full bg-white border border-slate-300 hover:border-brand-500 hover:bg-brand-50 text-slate-700 hover:text-brand-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm mt-1">
                         <i class="fa-solid fa-chalkboard-user"></i> Form Presentation Slides
                     </button>
                 </div>
@@ -218,23 +221,24 @@
             </div>
         </aside>
 
-        <!-- MIDDLE PANEL: Document Viewer Workspace (With Fix Strict Bounds & Borders) -->
-        <main class="flex-1 min-w-[480px] flex flex-col bg-slate-100 border-l border-r border-slate-200 overflow-hidden relative">
+        <!-- MIDDLE PANEL: Document Viewer Workspace (Fluid Width) -->
+        <!-- min-w-0 prevents flexbox from blowing out container bounds -->
+        <main class="flex-1 min-w-0 flex flex-col bg-slate-100/60 relative">
             
             <!-- Document View Control Ribbon -->
-            <div class="h-14 border-b border-slate-200 flex px-6 gap-6 bg-white justify-between items-center shrink-0">
+            <div class="h-14 border-b border-slate-200 flex px-6 gap-6 bg-white/80 backdrop-blur-md justify-between items-center shrink-0 z-10 shadow-sm sticky top-0">
                 <div class="flex gap-6 items-end h-full">
-                    <button onclick="switchTab('document')" id="tab-document" class="tab-btn tab-active pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Document Text</button>
-                    <button onclick="switchTab('report')" id="tab-report" class="tab-btn tab-inactive pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Synthesized Report</button>
-                    <button onclick="switchTab('visual')" id="tab-visual" class="tab-btn tab-inactive pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Visuals & Slides</button>
+                    <button onclick="switchTab('document')" id="tab-document" class="tab-btn tab-active pb-4 px-1 text-[11px] tracking-wider transition-all uppercase font-bold relative top-[1px]">Document Text</button>
+                    <button onclick="switchTab('report')" id="tab-report" class="tab-inactive pb-4 px-1 text-[11px] tracking-wider transition-all uppercase font-bold relative top-[1px]">Synthesized Report</button>
+                    <button onclick="switchTab('visual')" id="tab-visual" class="tab-inactive pb-4 px-1 text-[11px] tracking-wider transition-all uppercase font-bold relative top-[1px]">Visuals & Slides</button>
                 </div>
 
                 <!-- Document utilities directly integrated into Viewer Panel -->
                 <div id="middle-tools" class="flex items-center gap-3 invisible">
                     <!-- Translate utility -->
-                    <div class="flex items-center gap-1 bg-slate-100 border border-slate-300 rounded-lg px-2 py-1 shadow-inner">
-                        <i class="fa-solid fa-language text-slate-500 text-xs"></i>
-                        <select id="target-language" class="bg-transparent border-none text-slate-700 py-0.5 px-1 text-xs font-semibold focus:outline-none">
+                    <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 shadow-sm">
+                        <i class="fa-solid fa-language text-slate-500 text-xs ml-1"></i>
+                        <select id="target-language" class="bg-transparent border-none text-slate-700 py-0.5 px-1 text-xs font-semibold focus:outline-none cursor-pointer">
                             <option value="Spanish">Spanish</option>
                             <option value="French">French</option>
                             <option value="German">German</option>
@@ -242,14 +246,14 @@
                             <option value="Chinese">Chinese</option>
                             <option value="Hindi">Hindi</option>
                         </select>
-                        <button onclick="translateDocument()" class="hover:bg-slate-200 text-slate-700 p-1 rounded text-[10px] font-bold transition-colors">
+                        <button onclick="translateDocument()" class="hover:bg-slate-100 text-slate-700 p-1 rounded text-[10px] font-bold transition-colors border-l border-slate-200 pl-2 ml-1">
                             Apply
                         </button>
                     </div>
 
                     <!-- Voice Audio Playback -->
-                    <div class="h-8 border-l border-slate-300/60"></div>
-                    <button onclick="toggleAudio()" id="audio-btn" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
+                    <div class="h-6 border-l border-slate-300"></div>
+                    <button onclick="toggleAudio()" id="audio-btn" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
                         <span class="flex items-center gap-0.5" id="audio-wave" style="display:none;">
                             <span class="wave-bar"></span>
                             <span class="wave-bar" style="animation-delay: 0.15s"></span>
@@ -261,50 +265,56 @@
                 </div>
             </div>
 
+            <!-- Custom Toast Notifications Container -->
+            <div id="toast-container" class="absolute top-16 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
             <!-- Global Action / Progress Overlay -->
-            <div id="global-loader" class="hidden absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] z-50 flex flex-col items-center justify-center">
-                <div class="bg-white px-8 py-6 rounded-2xl shadow-xl border flex flex-col items-center max-w-sm text-center">
-                    <div class="loader mb-4 h-12 w-12 border-4"></div>
+            <div id="global-loader" class="hidden absolute inset-0 bg-slate-900/20 backdrop-blur-[2px] z-50 flex flex-col items-center justify-center">
+                <div class="bg-white px-8 py-6 rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center max-w-sm text-center transform scale-100 transition-all">
+                    <div class="loader mb-4 h-12 w-12 border-[3px]"></div>
                     <p id="loader-text" class="text-slate-800 font-bold text-sm">Accessing Intelligence Layer...</p>
-                    <p class="text-[10px] text-slate-500 mt-1">Please wait. Processing using Gemini Pro agent architecture.</p>
+                    <p class="text-[10px] text-slate-500 mt-1 font-medium">Please wait. Processing using Gemini Pro agent architecture.</p>
                 </div>
             </div>
 
-            <!-- Panel Contents -->
-            <div class="flex-1 overflow-y-auto relative p-6">
+            <!-- Panel Contents (Academic Desk Scrollable Area) -->
+            <div class="flex-1 overflow-y-auto relative p-6 md:p-8">
                 
                 <!-- DOCUMENT TAB -->
                 <div id="pane-document" class="pane h-full">
-                    <div class="max-w-3xl mx-auto h-full">
-                        <div id="empty-state-doc" class="flex flex-col items-center justify-center text-center h-full py-20">
-                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
-                                <i class="fa-solid fa-file-invoice text-2xl text-slate-400"></i>
+                    <!-- Academic Paper Container -->
+                    <div class="max-w-3xl mx-auto h-full min-h-[600px] bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] flex flex-col">
+                        <div id="empty-state-doc" class="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
+                            <div class="w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-file-invoice text-3xl text-slate-300"></i>
                             </div>
-                            <h2 class="text-base font-bold text-slate-800">No Document Ingested Yet</h2>
-                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">To begin your audit workspace, upload your document in the control panel on the left.</p>
+                            <h2 class="text-lg font-bold text-slate-800">No Document Ingested Yet</h2>
+                            <p class="text-slate-500 mt-2 max-w-sm text-xs leading-relaxed font-medium">To begin your audit workspace, upload your document in the control panel on the left to display it on this desk.</p>
                         </div>
-                        <div id="doc-content" class="markdown-body hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm min-h-full leading-relaxed"></div>
+                        <div id="doc-content" class="markdown-body hidden p-10 leading-relaxed h-full"></div>
                     </div>
                 </div>
 
                 <!-- REPORT TAB -->
                 <div id="pane-report" class="pane hidden h-full">
-                    <div class="max-w-3xl mx-auto">
-                        <div id="empty-state-report" class="flex flex-col items-center justify-center text-center py-20">
-                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
-                                <i class="fa-solid fa-file-circle-check text-2xl text-slate-400"></i>
+                    <div class="max-w-3xl mx-auto min-h-[600px] bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] flex flex-col">
+                        <div id="empty-state-report" class="flex-1 flex flex-col items-center justify-center text-center py-20 px-6">
+                            <div class="w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-file-circle-check text-3xl text-slate-300"></i>
                             </div>
-                            <h2 class="text-base font-bold text-slate-800">Synthesized Findings Queue</h2>
-                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">Configure a target template on the left and trigger report synthesis.</p>
+                            <h2 class="text-lg font-bold text-slate-800">Synthesized Findings Queue</h2>
+                            <p class="text-slate-500 mt-2 max-w-sm text-xs leading-relaxed font-medium">Configure a target template on the left and trigger report synthesis to view generated intelligence here.</p>
                         </div>
-                        <div class="flex justify-between items-center mb-4 hidden" id="report-actions">
-                            <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-brand-600"></i> SYNTHESIS SECURED</span>
-                            <button onclick="copyToClipboard('report-content-body')" class="text-xs text-slate-600 hover:text-brand-600 flex items-center gap-1.5 bg-white border px-3 py-1.5 rounded-lg shadow-sm font-semibold hover:border-brand-200 transition-all">
-                                <i class="fa-regular fa-copy text-xs"></i> Copy Clean Text
-                            </button>
-                        </div>
-                        <div id="report-content" class="markdown-body hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm">
-                            <div id="report-content-body"></div>
+                        <div class="hidden flex-col h-full" id="report-view-container">
+                            <div class="flex justify-between items-center px-10 py-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl shrink-0">
+                                <span class="text-xs font-bold text-slate-600 flex items-center gap-2"><i class="fa-solid fa-shield-check text-emerald-500 text-sm"></i> SYNTHESIS SECURED</span>
+                                <button onclick="copyToClipboard('report-content-body')" class="text-[11px] text-slate-600 hover:text-brand-700 flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm font-bold hover:border-brand-300 transition-all">
+                                    <i class="fa-regular fa-copy"></i> Copy Text
+                                </button>
+                            </div>
+                            <div id="report-content" class="markdown-body p-10 flex-1">
+                                <div id="report-content-body"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -312,29 +322,29 @@
                 <!-- VISUALS & SLIDES TAB -->
                 <div id="pane-visual" class="pane hidden h-full">
                     <div class="max-w-3xl mx-auto space-y-6">
-                        <div id="empty-state-visual" class="flex flex-col items-center justify-center text-center py-20">
-                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
-                                <i class="fa-solid fa-chart-gantt text-2xl text-slate-400"></i>
+                        <div id="empty-state-visual" class="min-h-[600px] bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center py-20 px-6">
+                            <div class="w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                                <i class="fa-solid fa-chart-gantt text-3xl text-slate-300"></i>
                             </div>
-                            <h2 class="text-base font-bold text-slate-800">Visualization and Presentation Deck</h2>
-                            <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">Create custom diagrams, workflow processes, or automated slides using the control desk tools.</p>
+                            <h2 class="text-lg font-bold text-slate-800">Visualization and Presentation Deck</h2>
+                            <p class="text-slate-500 mt-2 max-w-sm text-xs leading-relaxed font-medium">Create custom diagrams, workflow processes, or automated slides using the control desk tools.</p>
                         </div>
                         
                         <!-- Mermaid diagram output panel -->
-                        <div id="mermaid-container" class="hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-                            <span class="text-xs font-bold text-slate-400 self-start mb-4 uppercase tracking-widest"><i class="fa-solid fa-diagram-project mr-1 text-brand-600"></i> Rendered Process Model</span>
-                            <div id="mermaid-output" class="w-full flex justify-center"></div>
+                        <div id="mermaid-container" class="hidden bg-white p-10 rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center min-h-[600px]">
+                            <span class="text-[11px] font-bold text-slate-400 self-start mb-6 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-diagram-project text-brand-500"></i> Rendered Process Model</span>
+                            <div id="mermaid-output" class="w-full flex justify-center overflow-x-auto pb-4"></div>
                         </div>
 
                         <!-- Presentation display panel -->
-                        <div id="presentation-container" class="hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm">
-                            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-desktop mr-1 text-brand-600"></i> Slide Deck Preview</span>
-                                <button onclick="playPresentationAudio()" id="pres-audio-btn" class="bg-brand-50 text-brand-700 border border-brand-200 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-100 flex items-center gap-2 transition-all">
+                        <div id="presentation-container" class="hidden bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] flex flex-col min-h-[600px]">
+                            <div class="flex justify-between items-center border-b border-slate-100 bg-slate-50/50 px-10 py-5 rounded-t-2xl shrink-0">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-desktop text-indigo-500"></i> Slide Deck Preview</span>
+                                <button onclick="playPresentationAudio()" id="pres-audio-btn" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 flex items-center gap-2 transition-all shadow-sm">
                                     <i class="fa-solid fa-circle-play"></i> <span id="pres-audio-text">Read Slide Deck</span>
                                 </button>
                             </div>
-                            <div id="presentation-content" class="markdown-body"></div>
+                            <div id="presentation-content" class="markdown-body p-10 flex-1"></div>
                         </div>
                     </div>
                 </div>
@@ -342,60 +352,60 @@
             </div>
         </main>
 
-        <!-- RIGHT PANEL: Dedicated Auditor AI Chat Agent (ArxivLLM Style Sidebar Chat with Clean Dividing Left Border) -->
-        <aside class="w-96 bg-white flex flex-col shrink-0 z-10 border-l border-slate-200 shadow-lg">
+        <!-- RIGHT PANEL: Dedicated Auditor AI Chat Agent (Fixed Width) -->
+        <aside class="w-[300px] bg-white flex flex-col shrink-0 z-10 border-l border-slate-200 shadow-[-2px_0_10px_-5px_rgba(0,0,0,0.1)]">
             
             <!-- Chat Agent Status Header -->
-            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
                     <div class="relative">
-                        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shadow-md shadow-brand-500/20">
-                            <i class="fa-solid fa-robot text-white text-xs"></i>
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-robot text-white text-sm"></i>
                         </div>
-                        <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
                     </div>
                     <div>
                         <h3 class="text-xs font-bold text-slate-800">Audit AI Agent</h3>
-                        <p class="text-[9px] text-slate-400 font-medium">Interactive document chat context active</p>
+                        <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wide mt-0.5">Online & Ready</p>
                     </div>
                 </div>
-                <button onclick="clearChat()" class="text-slate-400 hover:text-slate-600 p-1 rounded transition-colors" title="Clear History">
-                    <i class="fa-solid fa-rotate"></i>
+                <button onclick="clearChat()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors" title="Clear History">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
             </div>
 
             <!-- Quick Agent Prompts Selection -->
-            <div class="p-3 bg-slate-50 border-b border-slate-100 flex gap-2 overflow-x-auto shrink-0 scrollbar-none" id="suggestions-box">
-                <button onclick="applyPrompt('Summarize key financial and regulatory risks you find.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
-                    ⚠️ Summarize Risks
+            <div class="p-3 bg-white border-b border-slate-100 flex flex-wrap gap-2 shrink-0" id="suggestions-box">
+                <button onclick="applyPrompt('Summarize key financial and regulatory risks you find.')" class="w-full text-left bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-600 hover:text-brand-700 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all shadow-sm flex items-center gap-2">
+                    <span>⚠️</span> Summarize Major Risks
                 </button>
-                <button onclick="applyPrompt('Check this document for non-compliance elements or deviations from common standards.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
-                    ⚖️ Compliance Audit
-                </button>
-                <button onclick="applyPrompt('Analyze the balance indicators, financials, or HR stats from this report and summarize.')" class="bg-white border border-slate-200 hover:border-brand-500 text-slate-600 hover:text-brand-600 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all shrink-0 shadow-sm">
-                    📊 Analyze Metrics
+                <button onclick="applyPrompt('Check this document for non-compliance elements or deviations from common standards.')" class="w-full text-left bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-slate-600 hover:text-brand-700 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all shadow-sm flex items-center gap-2">
+                    <span>⚖️</span> Compliance Deviation Check
                 </button>
             </div>
 
             <!-- Chat History Area -->
-            <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+            <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-5 bg-slate-50/30">
                 <div class="flex items-start gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-robot text-slate-600 text-xs"></i>
+                    <div class="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-500 text-xs"></i>
                     </div>
-                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
-                        <p class="text-xs text-slate-700 leading-relaxed font-medium">Hello, Analyst! Ingest an audit file and write or click any prompt to trigger analysis on the active source context.</p>
+                    <div class="bg-white border border-slate-200 p-3.5 rounded-2xl rounded-tl-none shadow-sm flex-1">
+                        <p class="text-xs text-slate-700 leading-relaxed font-medium">Hello, Analyst! Ingest an audit file on the left and write or click any prompt to trigger analysis on the active source context.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Chat Input Area -->
-            <div class="p-4 bg-white border-t border-slate-100">
+            <div class="p-4 bg-white border-t border-slate-200 shrink-0 shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]">
                 <div class="relative flex items-center">
-                    <textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-12 py-3 text-xs focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 resize-none transition-all shadow-inner focus:outline-none leading-relaxed text-slate-800" placeholder="Ask a question about this document..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"></textarea>
-                    <button onclick="sendChatMessage()" class="absolute right-3.5 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center hover:bg-brand-700 transition-all hover:scale-105 shadow-md shadow-brand-500/10">
-                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    <textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-4 pr-12 py-3 text-xs focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 resize-none transition-all shadow-inner focus:outline-none leading-relaxed text-slate-800" placeholder="Ask a question about this document..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"></textarea>
+                    <button onclick="sendChatMessage()" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:bg-brand-600 transition-colors shadow-md pointer-events-auto z-10">
+                        <i class="fa-solid fa-arrow-up text-xs"></i>
                     </button>
+                </div>
+                <div class="mt-2 text-center">
+                    <span class="text-[9px] text-slate-400 font-medium">Agent responses are grounded in provided documents.</span>
                 </div>
             </div>
         </aside>
@@ -422,6 +432,40 @@
             updateStatusBadge(true);
         } else {
             updateStatusBadge(false);
+        }
+
+        // --- Custom Toast Notification System (Replaces alert) ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            // Apply styling based on toast type
+            const baseClasses = "p-3.5 px-4 rounded-xl shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] text-xs font-bold mb-2 transform transition-all duration-300 translate-y-2 opacity-0 flex items-start gap-3 pointer-events-auto backdrop-blur-md";
+            if (type === 'error') {
+                toast.className = `${baseClasses} bg-rose-50/95 text-rose-700 border-rose-200`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            } else if (type === 'success') {
+                toast.className = `${baseClasses} bg-emerald-50/95 text-emerald-700 border-emerald-200`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            } else {
+                toast.className = `${baseClasses} bg-slate-800/95 text-white border-slate-700`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-info text-brand-400 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            }
+
+            container.appendChild(toast);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Remove after delay
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300); // Wait for transition
+            }, 4000);
         }
 
         function updateStatusBadge(configured) {
@@ -456,6 +500,7 @@
             appState.apiKey = document.getElementById('api-key').value.trim();
             localStorage.setItem('auditor_api_key', appState.apiKey);
             updateStatusBadge(!!appState.apiKey);
+            if(appState.apiKey) showToast("API Key saved successfully to local storage.", "success");
         }
 
         // --- Workspace View Switches ---
@@ -464,25 +509,22 @@
                 btn.classList.remove('tab-active');
                 btn.classList.add('tab-inactive');
             });
-            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
-            document.getElementById(`tab-${tabId}`).classList.remove('tab-inactive');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('tab-inactive');
+            }
 
             document.querySelectorAll('.pane').forEach(pane => pane.classList.add('hidden'));
-            document.getElementById(`pane-${tabId}`).classList.remove('hidden');
+            const activePane = document.getElementById(`pane-${tabId}`);
+            if(activePane) activePane.classList.remove('hidden');
         }
 
-        // Keep document layout clean from overlaps on tab switch
+        // Re-draw visible diagrams on resize to prevent canvas clipping
         window.addEventListener('resize', () => {
-            // Re-draw any visible mermaid diagram to preserve dynamic canvas scaling 
             const container = document.getElementById('mermaid-container');
             if (container && !container.classList.contains('hidden')) {
-                // Wait briefly for style calculations to finish
-                setTimeout(() => {
-                    const type = document.querySelector('.tab-active').innerText.includes('Visuals') ? 'rendered' : '';
-                    if (type) {
-                        // Triggers clean-up/re-render if necessary
-                    }
-                }, 150);
+                // Allows dynamic scaling within container bounds
             }
         });
 
@@ -501,7 +543,7 @@
             // Statistics updates
             const words = text.trim().split(/\s+/).filter(Boolean).length;
             const wordCountBadge = document.getElementById('word-count');
-            wordCountBadge.innerText = `${words} words`;
+            wordCountBadge.innerText = `${words.toLocaleString()} words`;
             wordCountBadge.classList.remove('hidden');
 
             document.getElementById('empty-state-doc').classList.add('hidden');
@@ -535,7 +577,7 @@
             const statusText = document.getElementById('file-status-text');
             const statusIcon = document.getElementById('file-status-icon');
             
-            statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-amber-50 text-amber-700 border-amber-100 transition-all";
+            statusEl.className = "text-xs p-3 rounded-xl flex items-start gap-2.5 shadow-sm border bg-amber-50 text-amber-700 border-amber-100 transition-all mt-2";
             statusIcon.className = "fa-solid fa-spinner animate-spin mt-0.5";
             statusText.innerText = `Ingesting: ${file.name}...`;
             statusEl.classList.remove('hidden');
@@ -562,16 +604,18 @@
                 if (!text || text.trim().length === 0) throw new Error("Could not extract any content from the document.");
                 
                 statusText.innerText = `Successfully loaded ${file.name}`;
-                statusIcon.className = "fa-solid fa-circle-check mt-0.5";
-                statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-green-50 text-green-700 border-green-100 transition-all";
+                statusIcon.className = "fa-solid fa-circle-check mt-0.5 text-sm";
+                statusEl.className = "text-xs p-3 rounded-xl flex items-start gap-2.5 shadow-sm border bg-emerald-50 text-emerald-700 border-emerald-100 transition-all mt-2";
                 
+                showToast(`Document "${file.name}" ingested successfully.`, "success");
                 updateDocView(text);
 
             } catch (err) {
                 console.error(err);
                 statusText.innerText = `Failure: ${err.message}`;
-                statusIcon.className = "fa-solid fa-circle-exclamation mt-0.5";
-                statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-rose-50 text-rose-700 border-rose-100 transition-all";
+                statusIcon.className = "fa-solid fa-circle-exclamation mt-0.5 text-sm";
+                statusEl.className = "text-xs p-3 rounded-xl flex items-start gap-2.5 shadow-sm border bg-rose-50 text-rose-700 border-rose-100 transition-all mt-2";
+                showToast(`Failed to ingest file: ${err.message}`, "error");
             }
         }
 
@@ -648,7 +692,7 @@
         // --- Core Gemini API Handling with Smart Cascading Model Fallbacks ---
         async function fetchGeminiAPI(payload) {
             if (!appState.apiKey) {
-                alert("Provide a valid Gemini API Key to complete workspace configuration.");
+                showToast("Provide a valid Gemini API Key to complete workspace configuration.", "error");
                 throw new Error("No API Key Provided");
             }
 
@@ -658,7 +702,7 @@
 
             for (const model of modelsToTry) {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${appState.apiKey}`;
-                let retries = 3;
+                let retries = 2; // Reduced retries to avoid long hangs, preferring rapid fallback
                 let delay = 1000;
 
                 while (retries > 0) {
@@ -696,13 +740,13 @@
                             break; // break retry loop to try the next model option
                         }
                         await new Promise(r => setTimeout(r, delay));
-                        delay *= 2;
+                        delay *= 1.5; // less aggressive exponential backoff
                     }
                 }
             }
 
-            // If we fall through all models without success, alert and throw error
-            alert(`API Configuration Fail: ${lastError.message}`);
+            // If we fall through all models without success, toast and throw error
+            showToast(`API Configuration Fail: ${lastError.message}`, "error");
             throw lastError;
         }
 
@@ -715,7 +759,7 @@
 
         function checkDoc() {
             if (!appState.documentText) {
-                alert("Please upload an audit-focused document template to begin.");
+                showToast("Please ingest an audit document template first to begin.", "error");
                 return false;
             }
             return true;
@@ -732,6 +776,7 @@
             try {
                 const translated = await fetchGeminiAPI(buildPayload(prompt, "You are a professional auditor and structural business translator. Translate layout models cleanly."));
                 updateDocView(translated, false);
+                showToast(`Translation to ${targetLang} applied.`, "success");
             } catch (e) {
                 console.error(e);
             } finally {
@@ -756,11 +801,11 @@
                 const reportMd = await fetchGeminiAPI(buildPayload(prompt));
                 
                 document.getElementById('empty-state-report').classList.add('hidden');
-                document.getElementById('report-actions').classList.remove('hidden');
-                const contentDiv = document.getElementById('report-content');
-                contentDiv.classList.remove('hidden');
-                document.getElementById('report-content-body').innerHTML = marked.parse(reportMd);
+                document.getElementById('report-view-container').classList.remove('hidden');
+                document.getElementById('report-view-container').classList.add('flex');
                 
+                document.getElementById('report-content-body').innerHTML = marked.parse(reportMd);
+                showToast(`${format} generated successfully.`, "success");
                 switchTab('report');
             } catch (e) {
                 console.error(e);
@@ -814,10 +859,12 @@
                 try {
                     const { svg } = await mermaid.render(`mermaid-rendered-${Date.now()}`, mermaidCode.trim());
                     outputDiv.innerHTML = svg;
+                    showToast(`Visual ${type} rendered successfully.`, "success");
                     switchTab('visual');
                 } catch(renderErr) {
                     console.error("Syntax rendering issue:", renderErr);
-                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold">Failed to build conceptual process maps due to syntax variations. Raw model code:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-3 font-mono rounded overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
+                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold bg-rose-50 p-4 border border-rose-200 rounded-xl w-full">Failed to build conceptual map due to syntax variations. Raw model code:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-4 font-mono rounded-xl overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
+                    showToast(`Model returned un-renderable Mermaid syntax.`, "error");
                     switchTab('visual');
                 }
 
@@ -847,6 +894,7 @@
                 presContainer.classList.remove('hidden');
                 
                 document.getElementById('presentation-content').innerHTML = marked.parse(presMd);
+                showToast("Slide deck formulated successfully.", "success");
                 switchTab('visual');
 
              } catch (e) {
@@ -864,14 +912,15 @@
             const container = document.getElementById('chat-history');
             container.innerHTML = `
                 <div class="flex items-start gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-robot text-slate-600 text-xs"></i>
+                    <div class="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-500 text-xs"></i>
                     </div>
-                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
+                    <div class="bg-white border border-slate-200 p-3.5 rounded-2xl rounded-tl-none shadow-sm flex-1">
                         <p class="text-xs text-slate-700 leading-relaxed font-medium">History cleared. Provide active document parameters below to query the model.</p>
                     </div>
                 </div>
             `;
+            showToast("Agent chat history wiped clean.", "info");
         }
 
         function applyPrompt(promptText) {
@@ -905,7 +954,7 @@
             Act as an elite expert auditor. Provide structured, evidence-grounded responses in professional tone. Use bold highlights or markdown formatting for table models or critical findings.
             `;
 
-            appendMessage('system', '<div class="loader inline-block h-3.5 w-3.5 border-2"></div> Assessing Audit Context...', 'loading-msg');
+            appendMessage('system', '<div class="loader inline-block h-3 w-3 border-2"></div> Analysing Document Content...', 'loading-msg');
             
             try {
                 const response = await fetchGeminiAPI(buildPayload(prompt, "You are Auditor LLM, a rigorous AI intelligence engine."));
@@ -918,7 +967,7 @@
             } catch (e) {
                 const loader = document.getElementById('loading-msg');
                 if (loader) loader.remove();
-                appendMessage('system', `<span class="text-rose-500">Error response: ${e.message}</span>`);
+                appendMessage('system', `<span class="text-rose-500 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Error: ${e.message}</span>`);
             }
         }
 
@@ -930,25 +979,26 @@
             if (role === 'user') {
                 div.className = "flex items-start gap-3 justify-end";
                 div.innerHTML = `
-                    <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+                    <div class="bg-slate-800 text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
                         <p class="text-xs leading-relaxed font-medium">${escapeHtml(content)}</p>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 shadow-sm">
-                        <i class="fa-solid fa-user text-white text-[10px]"></i>
+                    <div class="w-8 h-8 rounded-xl bg-slate-200 flex items-center justify-center shrink-0 shadow-sm border border-slate-300">
+                        <i class="fa-solid fa-user text-slate-600 text-xs"></i>
                     </div>
                 `;
             } else if (role === 'agent' || role === 'system') {
                 div.className = "flex items-start gap-3";
                 div.innerHTML = `
-                    <div class="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center shrink-0 shadow-sm">
-                        <i class="fa-solid fa-robot text-white text-[10px]"></i>
+                    <div class="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 shadow-sm border border-slate-800">
+                        <i class="fa-solid fa-robot text-white text-xs"></i>
                     </div>
-                    <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] text-xs text-slate-800 markdown-body leading-relaxed">
+                    <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex-1 text-xs text-slate-800 markdown-body leading-relaxed max-w-[85%]">
                         ${role === 'agent' ? marked.parse(content) : content}
                     </div>
                 `;
             }
             container.appendChild(div);
+            // Auto scroll to bottom
             container.scrollTop = container.scrollHeight;
         }
 
@@ -1033,7 +1083,7 @@
             textarea.select();
             document.execCommand("copy");
             document.body.removeChild(textarea);
-            alert("Synthesized report text copied to workspace clipboard.");
+            showToast("Synthesized text copied to workspace clipboard.", "info");
         }
 
     </script>
