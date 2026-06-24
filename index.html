@@ -120,6 +120,17 @@
         
         <!-- Authentic ArxivLLM API Key configuration bar -->
         <div class="flex items-center gap-3">
+            <!-- Sidebar Quick Toggles for small screen views -->
+            <div class="flex items-center gap-1 mr-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button onclick="toggleLeftSidebar()" class="p-1.5 rounded text-slate-600 hover:text-slate-900 hover:bg-white text-xs font-semibold transition-all flex items-center gap-1" title="Toggle Control Desk">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <div class="h-4 w-[1px] bg-slate-200"></div>
+                <button onclick="toggleRightSidebar()" class="p-1.5 rounded text-slate-600 hover:text-slate-900 hover:bg-white text-xs font-semibold transition-all flex items-center gap-1" title="Toggle Audit AI Agent">
+                    <i class="fa-solid fa-robot"></i>
+                </button>
+            </div>
+
             <div id="auth-status-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-xs font-semibold transition-colors">
                 <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse" id="status-dot"></span>
                 <span id="status-text">Keys Pending</span>
@@ -127,7 +138,7 @@
             <div class="relative flex items-center">
                 <i class="fa-solid fa-shield-halved absolute left-3 text-slate-400 text-sm"></i>
                 <input type="password" id="api-key" placeholder="Enter Gemini Pro API Key..." 
-                    class="pl-9 pr-10 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white w-72 transition-all shadow-inner"
+                    class="pl-9 pr-10 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white w-48 sm:w-64 transition-all shadow-inner"
                     onchange="saveApiKey()">
                 <button onclick="toggleKeyVisibility()" class="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors">
                     <i id="key-toggle-icon" class="fa-solid fa-eye text-xs"></i>
@@ -136,14 +147,19 @@
         </div>
     </header>
 
-    <!-- Main Workspace in 3-Column ArxivLLM Style -->
-    <div class="flex-1 flex overflow-hidden w-full">
+    <!-- Main Workspace in 3-Column ArxivLLM Style (Symmetrical sidebar formatting) -->
+    <div class="flex-1 flex overflow-hidden w-full relative">
         
-        <!-- LEFT PANEL: Sources, Upload, Actions -->
-        <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-sm">
+        <!-- LEFT PANEL: Control Desk - Equal Width 300px -->
+        <aside id="left-sidebar" class="w-[300px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 relative">
             <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                 <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-bars-staggered mr-1.5"></i> Control Desk</h2>
-                <span id="word-count" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium hidden">0 words</span>
+                <div class="flex items-center gap-2">
+                    <span id="word-count" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium hidden">0 words</span>
+                    <button onclick="toggleLeftSidebar()" class="text-slate-400 hover:text-slate-600 md:hidden p-1">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                </div>
             </div>
             
             <div class="p-5 overflow-y-auto flex-1 space-y-6">
@@ -203,10 +219,10 @@
                 <div class="space-y-3">
                     <label class="block text-xs font-bold text-slate-700 tracking-wide">Graphic Knowledge Base</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="generateVisual('mindmap')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
+                        <button onclick="generateVisual('mindmap')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm" title="Generate concept structures">
                             <i class="fa-solid fa-diagram-project text-indigo-500 text-sm"></i> Concept Map
                         </button>
-                        <button onclick="generateVisual('graph')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm">
+                        <button onclick="generateVisual('graph')" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-3 py-2.5 rounded-lg text-xs font-bold transition-colors flex flex-col items-center gap-1.5 shadow-sm" title="Generate visual processes">
                             <i class="fa-solid fa-chart-network text-emerald-500 text-sm"></i> Process Map
                         </button>
                     </div>
@@ -218,11 +234,11 @@
             </div>
         </aside>
 
-        <!-- MIDDLE PANEL: Document Viewer Workspace (With Fix Strict Bounds & Borders) -->
-        <main class="flex-1 min-w-[480px] flex flex-col bg-slate-100 border-l border-r border-slate-200 overflow-hidden relative">
+        <!-- MIDDLE PANEL: Document Viewer Workspace (Flexible remaining space) -->
+        <main class="flex-1 min-w-0 flex flex-col bg-slate-100/60 overflow-hidden relative">
             
             <!-- Document View Control Ribbon -->
-            <div class="h-14 border-b border-slate-200 flex px-6 gap-6 bg-white justify-between items-center shrink-0">
+            <div class="h-14 border-b border-slate-200/80 flex px-6 justify-between items-center bg-white shrink-0">
                 <div class="flex gap-6 items-end h-full">
                     <button onclick="switchTab('document')" id="tab-document" class="tab-btn tab-active pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Document Text</button>
                     <button onclick="switchTab('report')" id="tab-report" class="tab-btn tab-inactive pb-3.5 px-1 text-xs tracking-wide transition-all uppercase font-bold relative top-[1px]">Synthesized Report</button>
@@ -248,7 +264,7 @@
                     </div>
 
                     <!-- Voice Audio Playback -->
-                    <div class="h-8 border-l border-slate-300/60"></div>
+                    <div class="h-8 border-l border-slate-300/60 hidden sm:block"></div>
                     <button onclick="toggleAudio()" id="audio-btn" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
                         <span class="flex items-center gap-0.5" id="audio-wave" style="display:none;">
                             <span class="wave-bar"></span>
@@ -261,21 +277,24 @@
                 </div>
             </div>
 
+            <!-- Custom Non-blocking Toast Alerts Container -->
+            <div id="toast-container" class="absolute top-16 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
             <!-- Global Action / Progress Overlay -->
             <div id="global-loader" class="hidden absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] z-50 flex flex-col items-center justify-center">
-                <div class="bg-white px-8 py-6 rounded-2xl shadow-xl border flex flex-col items-center max-w-sm text-center">
+                <div class="bg-white px-8 py-6 rounded-2xl shadow-xl border flex flex-col items-center max-w-sm text-center animate-fade-in">
                     <div class="loader mb-4 h-12 w-12 border-4"></div>
                     <p id="loader-text" class="text-slate-800 font-bold text-sm">Accessing Intelligence Layer...</p>
                     <p class="text-[10px] text-slate-500 mt-1">Please wait. Processing using Gemini Pro agent architecture.</p>
                 </div>
             </div>
 
-            <!-- Panel Contents -->
+            <!-- Panel Contents (Human Readable layout container mimicking professional PDF interfaces) -->
             <div class="flex-1 overflow-y-auto relative p-6">
                 
-                <!-- DOCUMENT TAB -->
+                <!-- DOCUMENT TAB (Rendered dynamically as standard pages/spreadsheets/OCR) -->
                 <div id="pane-document" class="pane h-full">
-                    <div class="max-w-3xl mx-auto h-full">
+                    <div class="max-w-4xl mx-auto h-full">
                         <div id="empty-state-doc" class="flex flex-col items-center justify-center text-center h-full py-20">
                             <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
                                 <i class="fa-solid fa-file-invoice text-2xl text-slate-400"></i>
@@ -283,7 +302,8 @@
                             <h2 class="text-base font-bold text-slate-800">No Document Ingested Yet</h2>
                             <p class="text-slate-500 mt-1.5 max-w-sm text-xs leading-relaxed font-medium">To begin your audit workspace, upload your document in the control panel on the left.</p>
                         </div>
-                        <div id="doc-content" class="markdown-body hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm min-h-full leading-relaxed"></div>
+                        <!-- Centered document viewport, beautifully padded -->
+                        <div id="doc-content" class="hidden w-full flex flex-col gap-6 items-center"></div>
                     </div>
                 </div>
 
@@ -323,7 +343,7 @@
                         <!-- Mermaid diagram output panel -->
                         <div id="mermaid-container" class="hidden bg-white p-8 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
                             <span class="text-xs font-bold text-slate-400 self-start mb-4 uppercase tracking-widest"><i class="fa-solid fa-diagram-project mr-1 text-brand-600"></i> Rendered Process Model</span>
-                            <div id="mermaid-output" class="w-full flex justify-center"></div>
+                            <div id="mermaid-output" class="w-full flex justify-center overflow-auto"></div>
                         </div>
 
                         <!-- Presentation display panel -->
@@ -342,8 +362,8 @@
             </div>
         </main>
 
-        <!-- RIGHT PANEL: Dedicated Auditor AI Chat Agent (ArxivLLM Style Sidebar Chat with Clean Dividing Left Border) -->
-        <aside class="w-96 bg-white flex flex-col shrink-0 z-10 border-l border-slate-200 shadow-lg">
+        <!-- RIGHT PANEL: Dedicated Auditor AI Chat Agent - Equal Width 300px -->
+        <aside id="right-sidebar" class="w-[300px] bg-white flex flex-col shrink-0 z-10 border-l border-slate-200 shadow-lg relative">
             
             <!-- Chat Agent Status Header -->
             <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -356,12 +376,17 @@
                     </div>
                     <div>
                         <h3 class="text-xs font-bold text-slate-800">Audit AI Agent</h3>
-                        <p class="text-[9px] text-slate-400 font-medium">Interactive document chat context active</p>
+                        <p class="text-[9px] text-slate-400 font-medium">Interactive document context active</p>
                     </div>
                 </div>
-                <button onclick="clearChat()" class="text-slate-400 hover:text-slate-600 p-1 rounded transition-colors" title="Clear History">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
+                <div class="flex items-center gap-1">
+                    <button onclick="clearChat()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded transition-colors" title="Clear History">
+                        <i class="fa-solid fa-rotate text-xs"></i>
+                    </button>
+                    <button onclick="toggleRightSidebar()" class="text-slate-400 hover:text-slate-600 md:hidden p-1.5 rounded transition-colors" title="Collapse Sidebar">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Quick Agent Prompts Selection -->
@@ -384,7 +409,7 @@
                         <i class="fa-solid fa-robot text-slate-600 text-xs"></i>
                     </div>
                     <div class="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
-                        <p class="text-xs text-slate-700 leading-relaxed font-medium">Hello, Analyst! Ingest an audit file and write or click any prompt to trigger analysis on the active source context.</p>
+                        <p class="text-xs text-slate-700 leading-relaxed font-medium">Hello, Analyst! Ingest an audit file on the left, then write or click any prompt to query.</p>
                     </div>
                 </div>
             </div>
@@ -404,7 +429,6 @@
 
     <!-- Script Layer -->
     <script>
-        // --- Setup and State ---
         mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
         
         let appState = {
@@ -413,7 +437,10 @@
             reportType: 'Financial Report',
             isSpeaking: false,
             speechUtterance: null,
-            presentationText: ''
+            presentationText: '',
+            leftSidebarOpen: true,
+            rightSidebarOpen: true,
+            originalFile: null
         };
 
         // Initialize API status indicator
@@ -422,6 +449,37 @@
             updateStatusBadge(true);
         } else {
             updateStatusBadge(false);
+        }
+
+        // --- Custom Non-Blocking Toast Notification Engine ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const baseClasses = "p-3.5 px-4 rounded-xl shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] text-xs font-bold mb-2 transform transition-all duration-300 translate-y-2 opacity-0 flex items-start gap-3 pointer-events-auto backdrop-blur-md";
+            if (type === 'error') {
+                toast.className = `${baseClasses} bg-rose-50/95 text-rose-700 border-rose-200`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            } else if (type === 'success') {
+                toast.className = `${baseClasses} bg-emerald-50/95 text-emerald-700 border-emerald-200`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            } else {
+                toast.className = `${baseClasses} bg-slate-800/95 text-white border-slate-700`;
+                toast.innerHTML = `<i class="fa-solid fa-circle-info text-brand-400 mt-0.5 text-sm"></i> <span class="leading-relaxed">${message}</span>`;
+            }
+
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
 
         function updateStatusBadge(configured) {
@@ -456,6 +514,7 @@
             appState.apiKey = document.getElementById('api-key').value.trim();
             localStorage.setItem('auditor_api_key', appState.apiKey);
             updateStatusBadge(!!appState.apiKey);
+            if(appState.apiKey) showToast("Gemini Pro API key securely configured.", "success");
         }
 
         // --- Workspace View Switches ---
@@ -471,21 +530,6 @@
             document.getElementById(`pane-${tabId}`).classList.remove('hidden');
         }
 
-        // Keep document layout clean from overlaps on tab switch
-        window.addEventListener('resize', () => {
-            // Re-draw any visible mermaid diagram to preserve dynamic canvas scaling 
-            const container = document.getElementById('mermaid-container');
-            if (container && !container.classList.contains('hidden')) {
-                // Wait briefly for style calculations to finish
-                setTimeout(() => {
-                    const type = document.querySelector('.tab-active').innerText.includes('Visuals') ? 'rendered' : '';
-                    if (type) {
-                        // Triggers clean-up/re-render if necessary
-                    }
-                }, 150);
-            }
-        });
-
         function showLoader(message = "Extracting knowledge structures...") {
             document.getElementById('loader-text').innerText = message;
             document.getElementById('global-loader').classList.remove('hidden');
@@ -495,22 +539,36 @@
             document.getElementById('global-loader').classList.add('hidden');
         }
 
-        function updateDocView(text, isMarkdown = false) {
-            appState.documentText = text;
-            
-            // Statistics updates
+        // --- Sidebar Toggles (Symmetric 300px Width Actions) ---
+        function toggleLeftSidebar() {
+            const sidebar = document.getElementById('left-sidebar');
+            appState.leftSidebarOpen = !appState.leftSidebarOpen;
+            if (appState.leftSidebarOpen) {
+                sidebar.style.width = '300px';
+                sidebar.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                sidebar.style.width = '0px';
+                sidebar.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function toggleRightSidebar() {
+            const sidebar = document.getElementById('right-sidebar');
+            appState.rightSidebarOpen = !appState.rightSidebarOpen;
+            if (appState.rightSidebarOpen) {
+                sidebar.style.width = '300px';
+                sidebar.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                sidebar.style.width = '0px';
+                sidebar.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function updateWordCount(text) {
             const words = text.trim().split(/\s+/).filter(Boolean).length;
             const wordCountBadge = document.getElementById('word-count');
-            wordCountBadge.innerText = `${words} words`;
+            wordCountBadge.innerText = `${words.toLocaleString()} words`;
             wordCountBadge.classList.remove('hidden');
-
-            document.getElementById('empty-state-doc').classList.add('hidden');
-            const contentDiv = document.getElementById('doc-content');
-            contentDiv.classList.remove('hidden');
-            
-            contentDiv.innerHTML = isMarkdown ? marked.parse(text) : `<pre class="whitespace-pre-wrap font-sans text-sm text-slate-700 leading-relaxed">${escapeHtml(text)}</pre>`;
-            document.getElementById('middle-tools').classList.remove('invisible');
-            switchTab('document');
         }
 
         function escapeHtml(unsafe) {
@@ -522,14 +580,214 @@
                  .replace(/'/g, "&#039;");
         }
 
-        // --- File Parsers ---
-        if (typeof window.pdfjsLib !== 'undefined') {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        // --- Native Visual File Renderers (For True Human-Readable Workspace layout) ---
+
+        // 1. Beautiful Native PDF Reader Renderer
+        async function renderPDFVisual(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            
+            const docContent = document.getElementById('doc-content');
+            docContent.innerHTML = ''; // Clear layout
+            docContent.className = "flex flex-col gap-6 items-center w-full py-4";
+            
+            // Build visual viewer page-by-page
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                
+                // Create a standard layout card mirroring real physical pages
+                const pageCard = document.createElement('div');
+                pageCard.className = "relative bg-white shadow-[0_4px_25px_rgba(0,0,0,0.06)] border border-slate-200/80 rounded-2xl p-6 w-full flex flex-col items-center select-text mb-2 min-h-[400px]";
+                
+                // Top Page Header Indicator
+                const pageHeader = document.createElement('div');
+                pageHeader.className = "w-full flex justify-between items-center border-b border-slate-100 pb-2 mb-4 text-[10px] text-slate-400 font-bold tracking-wider uppercase";
+                pageHeader.innerHTML = `<span>Ingested Template Frame</span><span>Page ${pageNum} of ${pdf.numPages}</span>`;
+                pageCard.appendChild(pageHeader);
+
+                // Add a smart visual loader spinner inside the active page card while rendering
+                const pageSpinner = document.createElement('div');
+                pageSpinner.className = "flex flex-col items-center justify-center py-20 text-slate-400 text-xs gap-3 font-semibold";
+                pageSpinner.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-2xl text-brand-600"></i><span>Rendering page ${pageNum}...</span>`;
+                pageCard.appendChild(pageSpinner);
+
+                // Create Target Canvas
+                const canvas = document.createElement('canvas');
+                canvas.className = "max-w-full h-auto rounded border shadow-sm hidden bg-white";
+                pageCard.appendChild(canvas);
+                
+                docContent.appendChild(pageCard);
+                
+                // Fire rendering asynchronously to maintain fluid responsive UI thread
+                setTimeout(async () => {
+                    try {
+                        const context = canvas.getContext('2d');
+                        // Calculate perfect viewport based on parent container boundaries
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        await page.render(renderContext).promise;
+                        
+                        // Reveal canvas, clean loading overlays
+                        pageSpinner.remove();
+                        canvas.classList.remove('hidden');
+                    } catch (renderErr) {
+                        console.error(`Page ${pageNum} rendering issue:`, renderErr);
+                        pageSpinner.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i><span class="text-rose-500">Render issue</span>`;
+                    }
+                }, 50);
+            }
+            
+            document.getElementById('empty-state-doc').classList.add('hidden');
+            docContent.classList.remove('hidden');
+            document.getElementById('middle-tools').classList.remove('invisible');
+            switchTab('document');
         }
 
+        // 2. High-Fidelity Interactive Grid Spreadsheet Viewer
+        function renderExcelVisual(workbook) {
+            const docContent = document.getElementById('doc-content');
+            docContent.innerHTML = '';
+            docContent.className = "space-y-6 w-full";
+
+            // Multi-sheet navigational Tab control Desk
+            if (workbook.SheetNames.length > 1) {
+                const navRow = document.createElement('div');
+                navRow.className = "flex gap-2 border-b border-slate-200 pb-3 mb-2 overflow-x-auto shrink-0 scrollbar-none bg-slate-50 p-2 rounded-xl border";
+                workbook.SheetNames.forEach((name, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = `px-3.5 py-2 text-xs font-bold rounded-lg transition-all ${i === 0 ? 'bg-brand-600 text-white shadow-md shadow-brand-600/10' : 'bg-white hover:bg-slate-100 text-slate-600 border'}`;
+                    btn.innerText = name;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.excel-sheet-grid').forEach(grid => grid.classList.add('hidden'));
+                        document.getElementById(`sheet-view-${i}`).classList.remove('hidden');
+                        navRow.querySelectorAll('button').forEach(b => {
+                            b.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-white hover:bg-slate-100 text-slate-600 border transition-all";
+                        });
+                        btn.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white shadow-md shadow-brand-600/10 transition-all";
+                    };
+                    navRow.appendChild(btn);
+                });
+                docContent.appendChild(navRow);
+            }
+
+            workbook.SheetNames.forEach((name, index) => {
+                const sheet = workbook.Sheets[name];
+                const range = XLSX.utils.decode_range(sheet['!ref'] || "A1");
+                
+                const gridView = document.createElement('div');
+                gridView.id = `sheet-view-${index}`;
+                gridView.className = `excel-sheet-grid w-full overflow-x-auto bg-white border border-slate-200/80 rounded-2xl shadow-sm p-4 ${index === 0 ? '' : 'hidden'}`;
+                
+                const table = document.createElement('table');
+                table.className = "min-w-full border-collapse text-left text-xs font-sans text-slate-600";
+                
+                // Construct premium zebra tables with cell boarders
+                for (let r = range.s.r; r <= range.e.r; r++) {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-100 hover:bg-slate-50/50 transition-colors";
+                    for (let c = range.s.c; c <= range.e.c; c++) {
+                        const cellAddress = XLSX.utils.encode_cell({r: r, c: c});
+                        const cell = sheet[cellAddress];
+                        const td = r === 0 ? document.createElement('th') : document.createElement('td');
+                        
+                        if (r === 0) {
+                            td.className = "bg-slate-50/80 text-slate-800 font-bold p-3 border border-slate-200 uppercase tracking-wide text-[10px]";
+                        } else {
+                            td.className = "p-3 border border-slate-100 text-slate-600 font-medium whitespace-nowrap";
+                        }
+                        
+                        td.innerText = cell ? cell.w || cell.v || "" : "";
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                }
+                gridView.appendChild(table);
+                docContent.appendChild(gridView);
+            });
+
+            document.getElementById('empty-state-doc').classList.add('hidden');
+            docContent.classList.remove('hidden');
+            document.getElementById('middle-tools').classList.remove('invisible');
+            switchTab('document');
+        }
+
+        // 3. Dual-Panel Split OCR Image Viewer
+        function renderImageVisual(file, ocrText) {
+            const docContent = document.getElementById('doc-content');
+            docContent.innerHTML = '';
+            docContent.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full py-2";
+            
+            // Left Side: Beautiful Original Image Container
+            const sourceCard = document.createElement('div');
+            sourceCard.className = "bg-white border border-slate-200/80 rounded-2xl shadow-sm p-5 flex flex-col items-center justify-center min-h-[450px]";
+            sourceCard.innerHTML = `<span class="text-xs font-bold text-slate-400 self-start mb-4 uppercase tracking-wider"><i class="fa-solid fa-image text-brand-600 mr-1.5"></i> Original Ingested Image</span>`;
+            
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = "max-w-full h-auto max-h-[400px] object-contain rounded-xl border border-slate-100 shadow-inner";
+            sourceCard.appendChild(img);
+            
+            // Right Side: Extracted Structured OCR Text overlay
+            const ocrCard = document.createElement('div');
+            ocrCard.className = "bg-white border border-slate-200/80 rounded-2xl shadow-sm p-5 flex flex-col min-h-[450px]";
+            ocrCard.innerHTML = `
+                <span class="text-xs font-bold text-slate-400 self-start mb-4 uppercase tracking-wider"><i class="fa-solid fa-file-invoice text-brand-600 mr-1.5"></i> Extracted Structural Text</span>
+                <div class="flex-1 overflow-y-auto max-h-[400px] border border-slate-100 p-4 rounded-xl bg-slate-50/50 font-sans text-xs text-slate-700 leading-relaxed whitespace-pre-wrap select-text shadow-inner"></div>
+            `;
+            ocrCard.querySelector('div').innerText = ocrText;
+            
+            docContent.appendChild(sourceCard);
+            docContent.appendChild(ocrCard);
+
+            document.getElementById('empty-state-doc').classList.add('hidden');
+            docContent.classList.remove('hidden');
+            document.getElementById('middle-tools').classList.remove('invisible');
+            switchTab('document');
+        }
+
+        // 4. Premium Margined Paper Document layout for DOCX / TXT / Translations
+        function renderDocumentVisual(title, text, isMarkdown = false) {
+            const docContent = document.getElementById('doc-content');
+            docContent.innerHTML = '';
+            docContent.className = "w-full max-w-3xl mx-auto py-2";
+            
+            const paperCard = document.createElement('div');
+            paperCard.className = "bg-white shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-slate-200/80 rounded-2xl p-8 md:p-12 min-h-[600px] select-text prose prose-slate max-w-none";
+            
+            paperCard.innerHTML = `
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">${title}</h1>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-1"><i class="fa-solid fa-file-lines text-brand-600 mr-1"></i> Ingested Text Document</p>
+                </div>
+                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap font-sans"></div>
+            `;
+            
+            if (isMarkdown) {
+                paperCard.querySelector('.text-slate-700').innerHTML = marked.parse(text);
+            } else {
+                paperCard.querySelector('.text-slate-700').innerText = text;
+            }
+            
+            docContent.appendChild(paperCard);
+
+            document.getElementById('empty-state-doc').classList.add('hidden');
+            docContent.classList.remove('hidden');
+            document.getElementById('middle-tools').classList.remove('invisible');
+            switchTab('document');
+        }
+
+        // --- Core File Handling Orchestrator ---
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            appState.originalFile = file;
 
             const statusEl = document.getElementById('file-status');
             const statusText = document.getElementById('file-status-text');
@@ -546,32 +804,60 @@
 
                 if (['txt', 'csv'].includes(ext)) {
                     text = await file.text();
+                    appState.documentText = text;
+                    updateWordCount(text);
+                    renderDocumentVisual(file.name, text, ext === 'csv' ? false : true);
                 } else if (file.type.startsWith('image/')) {
                     statusText.innerText = `Performing Deep OCR with Gemini...`;
                     text = await extractTextFromImage(file);
+                    appState.documentText = text;
+                    updateWordCount(text);
+                    renderImageVisual(file, text);
                 } else if (ext === 'pdf' && typeof window.pdfjsLib !== 'undefined') {
+                    statusText.innerText = `Extracting structural text from PDF...`;
                     text = await extractTextFromPDF(file);
+                    appState.documentText = text;
+                    updateWordCount(text);
+                    await renderPDFVisual(file);
                 } else if (['xlsx', 'xls'].includes(ext) && typeof XLSX !== 'undefined') {
-                    text = await extractTextFromExcel(file);
+                    statusText.innerText = `Compiling spreadsheets grids...`;
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, {type: 'array'});
+                    
+                    // Extract text contents in background for the AI chat agent
+                    let backgroundText = "";
+                    workbook.SheetNames.forEach(sheetName => {
+                        const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+                        backgroundText += `--- Sheet Focus: ${sheetName} ---\n${csv}\n\n`;
+                    });
+                    appState.documentText = backgroundText;
+                    updateWordCount(backgroundText);
+                    renderExcelVisual(workbook);
                 } else if (['doc', 'docx'].includes(ext) && typeof mammoth !== 'undefined') {
                     text = await extractTextFromWord(file);
+                    appState.documentText = text;
+                    updateWordCount(text);
+                    renderDocumentVisual(file.name, text);
                 } else {
                     throw new Error("Target file format or library is unsupported.");
                 }
 
-                if (!text || text.trim().length === 0) throw new Error("Could not extract any content from the document.");
+                if (!appState.documentText || appState.documentText.trim().length === 0) {
+                    throw new Error("Could not extract any structural text contents from the document.");
+                }
                 
                 statusText.innerText = `Successfully loaded ${file.name}`;
                 statusIcon.className = "fa-solid fa-circle-check mt-0.5";
                 statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-green-50 text-green-700 border-green-100 transition-all";
                 
-                updateDocView(text);
+                showToast(`Loaded ${file.name} successfully into visual viewports.`, "success");
 
             } catch (err) {
                 console.error(err);
                 statusText.innerText = `Failure: ${err.message}`;
                 statusIcon.className = "fa-solid fa-circle-exclamation mt-0.5";
                 statusEl.className = "text-xs p-3 rounded-lg flex items-start gap-2.5 shadow-sm border bg-rose-50 text-rose-700 border-rose-100 transition-all";
+                showToast(`Load failed: ${err.message}`, "error");
             }
         }
 
@@ -648,17 +934,16 @@
         // --- Core Gemini API Handling with Smart Cascading Model Fallbacks ---
         async function fetchGeminiAPI(payload) {
             if (!appState.apiKey) {
-                alert("Provide a valid Gemini API Key to complete workspace configuration.");
+                showToast("Please provide a valid Gemini API Key to authorize analysis.", "error");
                 throw new Error("No API Key Provided");
             }
 
-            // Order of preference: stable general model, system default preview model, older fallback models
-            const modelsToTry = ['gemini-2.5-flash', 'gemini-2.5-flash-preview-09-2025', 'gemini-1.5-flash'];
+            const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-flash'];
             let lastError = null;
 
             for (const model of modelsToTry) {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${appState.apiKey}`;
-                let retries = 3;
+                let retries = 2;
                 let delay = 1000;
 
                 while (retries > 0) {
@@ -673,10 +958,9 @@
                             const errData = await response.json();
                             const errMsg = errData.error?.message || "";
                             
-                            // If model is explicitly missing or not found on this API account, try next model in loop directly
-                            if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('not supported') || errMsg.includes('unregistered')) {
+                            if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('not supported')) {
                                 lastError = new Error(errMsg || `Model ${model} not available`);
-                                retries = 0; // stop retrying this specific model
+                                retries = 0;
                                 break; 
                             }
                             throw new Error(errMsg || `Status issue: ${response.status}`);
@@ -686,23 +970,20 @@
                         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
                             return data.candidates[0].content.parts[0].text;
                         } else {
-                            throw new Error("Received anomalous interface structures from Gemini API.");
+                            throw new Error("Received anomaly structure from Gemini API.");
                         }
                         
                     } catch (error) {
                         retries--;
                         lastError = error;
-                        if (retries === 0) {
-                            break; // break retry loop to try the next model option
-                        }
+                        if (retries === 0) break;
                         await new Promise(r => setTimeout(r, delay));
-                        delay *= 2;
+                        delay *= 1.5;
                     }
                 }
             }
 
-            // If we fall through all models without success, alert and throw error
-            alert(`API Configuration Fail: ${lastError.message}`);
+            showToast(`API Operation Fail: ${lastError.message}`, "error");
             throw lastError;
         }
 
@@ -715,23 +996,27 @@
 
         function checkDoc() {
             if (!appState.documentText) {
-                alert("Please upload an audit-focused document template to begin.");
+                showToast("Please upload or load an audit document first.", "error");
                 return false;
             }
             return true;
         }
 
         // --- Core Intelligence Synthesis Tools ---
-
         async function translateDocument() {
             if (!checkDoc()) return;
             const targetLang = document.getElementById('target-language').value;
-            const prompt = `Translate the subsequent document directly into ${targetLang}. Preserve critical layout metrics.\n\nDocument:\n${appState.documentText.substring(0, 30000)}`;
+            const prompt = `Translate the subsequent document directly into ${targetLang}. Preserve critical structural headings.\n\nDocument:\n${appState.documentText.substring(0, 30000)}`;
             
             showLoader(`Translating report into ${targetLang}...`);
             try {
                 const translated = await fetchGeminiAPI(buildPayload(prompt, "You are a professional auditor and structural business translator. Translate layout models cleanly."));
-                updateDocView(translated, false);
+                
+                // Re-render the translated text nicely inside our premium human-readable margined paper layout
+                const viewTitle = appState.originalFile ? `Translated: ${appState.originalFile.name}` : `Translated Document`;
+                renderDocumentVisual(viewTitle, translated);
+                
+                showToast(`Successfully translated workspace views to ${targetLang}`, "success");
             } catch (e) {
                 console.error(e);
             } finally {
@@ -761,6 +1046,7 @@
                 contentDiv.classList.remove('hidden');
                 document.getElementById('report-content-body').innerHTML = marked.parse(reportMd);
                 
+                showToast(`${format} compiled and ready.`, "success");
                 switchTab('report');
             } catch (e) {
                 console.error(e);
@@ -775,15 +1061,17 @@
 
              let prompt = "";
              if (type === 'mindmap') {
-                 prompt = `Develop a structurally optimized Mermaid.js Mindmap of primary issues, processes, and entities found in this ${reportType}.
+                 // Flowcharts are perfectly robust across all versions of Mermaid and bypass lazyload issues.
+                 prompt = `Develop a structurally optimized, highly visual Mermaid.js Concept Map representing the key findings, risks, and entities of this ${reportType}.
+                 Use a "graph TD" (Top-Down) or "graph LR" (Left-to-Right) layout representing nodes radiating out to capture categories.
                  
                  CRITICAL MERMAID SYNTAX RULES:
-                 1. All node text/labels MUST be enclosed in double quotes, e.g., id("Node Text Here") or id["Node Text Here"].
-                 2. NEVER put raw parentheses () or brackets [] inside node labels unless wrapped in double quotes. E.g., Use id["Financial Statements (2021)"] instead of id[Financial Statements (2021)] or id(Financial Statements).
-                 3. Avoid any markdown bold/italic inside node labels.
-                 4. Return ONLY a valid Mermaid.js block starting with "mindmap". Avoid markdown wrappers around the mermaid block.
-                 
-                 Context: ${appState.documentText.substring(0, 20000)}`;
+                 1. Always start the block with "graph TD" or "graph LR" (NOT "mindmap" keyword).
+                 2. All node text/labels MUST be enclosed in double quotes, e.g., root["Central Topic"] or node1["Sub-topic"].
+                 3. Do not use special characters or punctuation in node IDs (use simple alphanumeric IDs like root, node1, node2).
+                 4. Set gorgeous visual shapes. e.g., root["CENTRAL TOPIC"] --> category1(["Compliance Area"]) --> item1["Detail Indicator"]
+                 5. Avoid any markdown formatting like bold/italic inside node labels.
+                 6. Return ONLY the raw mermaid graph code inside a mermaid code block.`;
              } else {
                  prompt = `Develop a logical Mermaid.js flow diagram (graph TD) showing process dependencies, issues, or entity links inside this ${reportType}.
                  
@@ -814,10 +1102,11 @@
                 try {
                     const { svg } = await mermaid.render(`mermaid-rendered-${Date.now()}`, mermaidCode.trim());
                     outputDiv.innerHTML = svg;
+                    showToast("Diagram compiled successfully.", "success");
                     switchTab('visual');
                 } catch(renderErr) {
                     console.error("Syntax rendering issue:", renderErr);
-                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold">Failed to build conceptual process maps due to syntax variations. Raw model code:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-3 font-mono rounded overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
+                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold p-3 bg-rose-50 border border-rose-100 rounded-lg">Failed to render Mermaid chart cleanly. Here is the raw syntax generated:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-3 font-mono rounded overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
                     switchTab('visual');
                 }
 
@@ -847,6 +1136,7 @@
                 presContainer.classList.remove('hidden');
                 
                 document.getElementById('presentation-content').innerHTML = marked.parse(presMd);
+                showToast("Presentation slide deck generated successfully.", "success");
                 switchTab('visual');
 
              } catch (e) {
@@ -872,6 +1162,7 @@
                     </div>
                 </div>
             `;
+            showToast("Conversation cleared.", "info");
         }
 
         function applyPrompt(promptText) {
@@ -909,7 +1200,8 @@
             
             try {
                 const response = await fetchGeminiAPI(buildPayload(prompt, "You are Auditor LLM, a rigorous AI intelligence engine."));
-                document.getElementById('loading-msg').remove();
+                const loadingMsg = document.getElementById('loading-msg');
+                if (loadingMsg) loadingMsg.remove();
                 
                 appendMessage('agent', response);
                 chatHistoryArray.push({role: 'User', content: message});
@@ -952,8 +1244,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // --- Document and presentation TTS integration ---
-
+        // --- Core Audio Engine (Web Speech API with Chrome Lockup Protection) ---
         function toggleAudio() {
             if (!checkDoc()) return;
             const btnText = document.getElementById('audio-btn-text');
@@ -966,12 +1257,14 @@
                 btnText.innerText = "Read Text";
                 btnIcon.className = "fa-solid fa-volume-high text-brand-600";
                 wave.style.display = "none";
+                showToast("Audio stopped.", "info");
             } else {
-                readTextChunks(appState.documentText);
                 appState.isSpeaking = true;
                 btnText.innerText = "Stop Reading";
                 btnIcon.className = "fa-solid fa-circle-stop text-rose-500";
                 wave.style.display = "inline-flex";
+                showToast("Beginning synthesis...", "info");
+                readTextChunks(appState.documentText);
             }
         }
 
@@ -985,19 +1278,32 @@
                 btnText.innerText = "Read Slide Deck";
             } else {
                 const cleanText = appState.presentationText.replace(/[#*`>]/g, '');
+                appState.isSpeaking = true;
+                btnText.innerText = "Stop Reading Slides";
                 readTextChunks(cleanText, () => {
                     appState.isSpeaking = false;
                     btnText.innerText = "Read Slide Deck";
                 });
-                appState.isSpeaking = true;
-                btnText.innerText = "Stop Reading Slides";
             }
         }
 
         function readTextChunks(text, onComplete) {
+            // Strict reset to clear lockups
             window.speechSynthesis.cancel();
             
-            const chunks = text.match(/[\s\S]{1,200}(?!\S)|[\s\S]{1,200}/g) || [];
+            const cleanText = text.replace(/[*#`_\-|>]/g, ' ').trim();
+            if (!cleanText) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            // Segment cleanly to bypass Chrome max-character crashes and prevent speech freeze
+            const chunks = cleanText.split(/[.!?\n]+/).map(s => s.trim()).filter(s => s.length > 5);
+            if (chunks.length === 0) {
+                if (onComplete) onComplete();
+                return;
+            }
+
             let i = 0;
 
             function speakNext() {
@@ -1013,15 +1319,33 @@
                 }
                 
                 const utterance = new SpeechSynthesisUtterance(chunks[i]);
-                utterance.rate = 1.05;
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                utterance.lang = 'en-US'; // Strict language set for compatibility across browsers
+
                 utterance.onend = () => {
                     i++;
                     speakNext();
                 };
-                utterance.onerror = (e) => { console.error('TTS Error', e); };
-                window.speechSynthesis.speak(utterance);
+                utterance.onerror = (e) => { 
+                    console.warn('TTS chunk error, skipping segment:', e);
+                    i++;
+                    speakNext();
+                };
+
+                // CRITICAL CHROME FIX: Async safe timeout delay to allow Chrome internal thread cancellation to finish.
+                setTimeout(() => {
+                    if (appState.isSpeaking) {
+                        window.speechSynthesis.speak(utterance);
+                    }
+                }, 100);
             }
-            speakNext();
+
+            // Safe bootstrap delay
+            setTimeout(() => {
+                speakNext();
+            }, 150);
         }
 
         function copyToClipboard(elementId) {
@@ -1031,11 +1355,10 @@
             textarea.value = text;
             document.body.appendChild(textarea);
             textarea.select();
-            document.execCommand("copy");
+            document.execCommand('copy');
             document.body.removeChild(textarea);
-            alert("Synthesized report text copied to workspace clipboard.");
+            showToast("Report text copied to workspace clipboard.", "info");
         }
-
     </script>
 </body>
 </html>
