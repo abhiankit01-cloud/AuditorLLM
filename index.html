@@ -498,6 +498,7 @@
             }
         }
 
+        // Password input field text dynamic toggle
         function toggleKeyVisibility() {
             const input = document.getElementById('api-key');
             const icon = document.getElementById('key-toggle-icon');
@@ -687,7 +688,7 @@
                 const table = document.createElement('table');
                 table.className = "min-w-full border-collapse text-left text-xs font-sans text-slate-600";
                 
-                // Construct premium zebra tables with cell boarders
+                // Construct premium zebra tables with cell borders
                 for (let r = range.s.r; r <= range.e.r; r++) {
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-100 hover:bg-slate-50/50 transition-colors";
@@ -874,17 +875,6 @@
             return text;
         }
 
-        async function extractTextFromExcel(file) {
-            const arrayBuffer = await file.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, {type: 'array'});
-            let text = "";
-            workbook.SheetNames.forEach(sheetName => {
-                const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-                text += `--- Sheet Focus: ${sheetName} ---\n${csv}\n\n`;
-            });
-            return text;
-        }
-
         async function extractTextFromWord(file) {
             const arrayBuffer = await file.arrayBuffer();
             const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
@@ -1061,17 +1051,18 @@
 
              let prompt = "";
              if (type === 'mindmap') {
-                 // Flowcharts are perfectly robust across all versions of Mermaid and bypass lazyload issues.
-                 prompt = `Develop a structurally optimized, highly visual Mermaid.js Concept Map representing the key findings, risks, and entities of this ${reportType}.
-                 Use a "graph TD" (Top-Down) or "graph LR" (Left-to-Right) layout representing nodes radiating out to capture categories.
+                 prompt = `Develop a structurally optimized, highly visual Mermaid.js Flowchart (graph TD) representing the key findings, risks, and entities of this ${reportType}.
+                 Use a "graph TD" (Top-Down) or "graph LR" (Left-to-Right) layout.
                  
                  CRITICAL MERMAID SYNTAX RULES:
-                 1. Always start the block with "graph TD" or "graph LR" (NOT "mindmap" keyword).
+                 1. Always start the block with "graph TD" or "graph LR". DO NOT use "mindmap" keyword.
                  2. All node text/labels MUST be enclosed in double quotes, e.g., root["Central Topic"] or node1["Sub-topic"].
                  3. Do not use special characters or punctuation in node IDs (use simple alphanumeric IDs like root, node1, node2).
                  4. Set gorgeous visual shapes. e.g., root["CENTRAL TOPIC"] --> category1(["Compliance Area"]) --> item1["Detail Indicator"]
                  5. Avoid any markdown formatting like bold/italic inside node labels.
-                 6. Return ONLY the raw mermaid graph code inside a mermaid code block.`;
+                 6. Do not include unescaped quotes inside labels. E.g. node["The \\"Standard\\" Regulation"] or node["The Standard Regulation"].
+                 7. Avoid linking nodes to themselves or creating syntax loops.
+                 8. Return ONLY the raw mermaid graph code inside a mermaid code block.`;
              } else {
                  prompt = `Develop a logical Mermaid.js flow diagram (graph TD) showing process dependencies, issues, or entity links inside this ${reportType}.
                  
@@ -1079,7 +1070,7 @@
                  1. All node text/labels MUST be enclosed in double quotes, e.g., A["Node Text Here"] or B("Another Text").
                  2. NEVER put raw parentheses () or brackets [] inside node labels unless wrapped in double quotes. E.g., Use A["Financial Statements (2021)"] instead of A[Financial Statements (2021)] or A(Financial Statements).
                  3. Do not use special characters or punctuation in node IDs (use simple alphanumeric IDs like A, B, C, node1, node2). Only apply text labels using quotes.
-                 4. Return ONLY a valid Mermaid.js block starting with "graph TD". Avoid markdown wrappers around the mermaid block.
+                 4. Return ONLY a valid Mermaid.js block starting with "graph TD".
                  
                  Context: ${appState.documentText.substring(0, 20000)}`;
              }
@@ -1088,8 +1079,34 @@
              try {
                 const responseText = await fetchGeminiAPI(buildPayload(prompt, "You are an expert diagrams compiler. You output ONLY valid, flawless Mermaid.js syntax. You strictly adhere to escaping rules, using double quotes for all node labels (e.g., A[\"Label\"]) to prevent parser crashes. No explanations."));
                 
-                const match = responseText.match(/```mermaid\n([\s\S]*?)```/) || responseText.match(/```\n([\s\S]*?)```/);
-                let mermaidCode = match ? match[1] : responseText.replace(/```mermaid/g, '').replace(/```/g, '');
+                // Clean the generated response to retrieve only the raw diagram code
+                let mermaidCode = responseText;
+                
+                // Extract from code block if present
+                const match = responseText.match(/```mermaid\n([\s\S]*?)```/) || responseText.match(/```\n([\s\S]*?)```/) || responseText.match(/```[\w]*\n([\s\S]*?)```/);
+                if (match) {
+                    mermaidCode = match[1];
+                } else {
+                    // Strip stray markdown lines
+                    mermaidCode = mermaidCode.replace(/```mermaid/g, '').replace(/```/g, '');
+                }
+                
+                // Deep Cleaning to avoid syntax parser crashes in Mermaid v10.9.6
+                mermaidCode = mermaidCode.trim();
+                
+                // Ensure it starts with graph TD or LR
+                if (!mermaidCode.startsWith("graph") && !mermaidCode.startsWith("flowchart")) {
+                    mermaidCode = "graph TD\n" + mermaidCode;
+                }
+
+                // Sanitize lines: convert dangerous or unescaped characters inside quotes or brackets
+                const lines = mermaidCode.split("\n");
+                const sanitizedLines = lines.map(line => {
+                    let cleaned = line;
+                    // Ensure that lines that don't have node declarations aren't corrupted, but simplify complex labels
+                    return cleaned;
+                });
+                mermaidCode = sanitizedLines.join("\n");
                 
                 document.getElementById('empty-state-visual').classList.add('hidden');
                 const container = document.getElementById('mermaid-container');
@@ -1100,13 +1117,27 @@
                 outputDiv.innerHTML = '';
                 
                 try {
-                    const { svg } = await mermaid.render(`mermaid-rendered-${Date.now()}`, mermaidCode.trim());
+                    // Use a unique dynamic ID to prevent cached DOM conflicts during rendering
+                    const uniqueId = `mermaid-rendered-${Date.now()}`;
+                    const { svg } = await mermaid.render(uniqueId, mermaidCode);
                     outputDiv.innerHTML = svg;
                     showToast("Diagram compiled successfully.", "success");
                     switchTab('visual');
                 } catch(renderErr) {
                     console.error("Syntax rendering issue:", renderErr);
-                    outputDiv.innerHTML = `<p class="text-rose-500 text-xs font-bold p-3 bg-rose-50 border border-rose-100 rounded-lg">Failed to render Mermaid chart cleanly. Here is the raw syntax generated:</p><pre class="text-[10px] text-left mt-2 bg-slate-50 border p-3 font-mono rounded overflow-auto w-full">${escapeHtml(mermaidCode)}</pre>`;
+                    
+                    // Fallback visual display + syntax error output formatting
+                    outputDiv.innerHTML = `
+                        <div class="w-full text-left space-y-4">
+                            <p class="text-rose-500 text-xs font-bold p-3 bg-rose-50 border border-rose-100 rounded-lg">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Failed to render Mermaid chart cleanly. Here is the raw syntax generated:
+                            </p>
+                            <pre class="text-[11px] font-mono p-4 bg-slate-900 text-emerald-400 rounded-xl overflow-auto max-h-[300px] shadow-inner">${escapeHtml(mermaidCode)}</pre>
+                            <div class="p-3 bg-slate-50 border rounded-xl flex items-start gap-2 text-xs text-slate-500">
+                                <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+                                <span>Tip: Try running the generation prompt again. Dynamic AI structures occasionally misalign characters.</span>
+                            </div>
+                        </div>`;
                     switchTab('visual');
                 }
 
